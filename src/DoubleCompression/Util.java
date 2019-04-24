@@ -22,5 +22,9 @@ public class Util {
 		}
 		return ret;
 	}
+	
+	public static double xorDoubles(double d1, double d2) {
+		return toDouble(xor(toByteArray(d1), toByteArray(d2)));
+	}
 
 }

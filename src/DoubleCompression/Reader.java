@@ -37,7 +37,9 @@ public class Reader {
 	
 	public static ArrayList<ByteBuffer> readCompressed (String f) throws IOException
     {
-		Scanner scanner = new Scanner(new File(f));
+		File file = new File(f);
+		System.out.println(file.isFile());
+		Scanner scanner = new Scanner(file);
 		ArrayList<ByteBuffer> ret = new ArrayList<ByteBuffer>();
         
         scanner.useDelimiter("\n");
