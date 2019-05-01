@@ -1,1 +1,0 @@
-System.out.println(String.valueOf(213000 / 1024.0 / 1024.0));
