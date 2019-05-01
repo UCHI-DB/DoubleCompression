@@ -13,15 +13,21 @@ public class GorillaCompressor {
 	double[] input;
 	String bitBuffer = "";
 	ByteArrayOutputStream ret = new ByteArrayOutputStream();
+	int numWritten = 0;
 	
 	public GorillaCompressor (double[] input) {
 		this.input = input;
-		//prevLeading = 17;
 	}
 	
 	public ByteBuffer compress() throws IOException {
 		for(double d : input) {
+			//System.out.println("Compressing " + d);
+			if(d == -0.999456909) {
+				//System.out.println("Hit");
+			}
+			numWritten = 0;
 			compressOne(d);
+			//System.out.println(numWritten);
 		}
 		flush();
 		return ByteBuffer.wrap(ret.toByteArray());
@@ -46,32 +52,49 @@ public class GorillaCompressor {
 				addBit('1');
 				int leading = leadingZeroes(xorString);
 				int trailing = trailingZeroes(xorString);
-				if(leading >= prevLeading && trailing == prevTrailing) {
+				String meaningful = meaningful(xorString);
+				int meaningfulLen = meaningful.length();
+				if(trailing % 2 == 1) {
+					meaningful = "0" + meaningful;
+					trailing -= 1;
+				} 
+				if(leading % 2 == 1) {
+					meaningful += 0;
+					leading -= 1;
+				}
+				meaningfulLen = meaningful.length() / 2;
+				leading /= 2;
+				trailing /= 2;
+				if(leading == prevLeading && trailing == prevTrailing) {
 					addBit('0');
-					for(char c : meaningfulPrev(xorString).toCharArray()) {
-						addInt(Character.digit(c, 16), 8);
+					for(int i = 0; i < meaningfulLen; i++) {
+						String sub = meaningful.substring(i*2,i*2+2);
+						addInt(Integer.parseInt(sub, 16), 8);
 					}
+//					for(char c : meaningfulPrev(xorString).toCharArray()) {
+//						addInt(Character.digit(c, 16), 8);
+//					}
 				} else {
 					addBit('1');
 					addInt(leading, 5);
-					String meaningful = meaningful(xorString);
-					//System.out.println(padLength(Integer.toBinaryString(meaningful.length()), 6));
-					addInt(meaningful.length(), 6);
-					//System.out.println("Meaningful: " + meaningful);
-					//System.out.println(meaningful.length() % 2);
-					for(char c : meaningful.toCharArray()) {
-						addInt(Character.digit(c, 16), 8);
+					addInt(meaningfulLen, 6);
+					for(int i = 0; i < meaningfulLen; i++) {
+						String sub = meaningful.substring(i*2,i*2+2);
+						addInt(Integer.parseInt(sub, 16), 8);
 					}
+//					for(char c : meaningful.toCharArray()) {
+//						addInt(Character.digit(c, 16), 8);
+//					}
 				}
-				setPrev(d, xorString);
+				setPrev(d, leading, trailing);
 			}
 		}
 	}
 	
-	void setPrev (double d, String xorString) {
+	void setPrev (double d, int leading, int trailing) {
 		prev = d;
-		prevLeading = leadingZeroes(xorString);
-		prevTrailing = trailingZeroes(xorString);
+		prevLeading = leading;
+		prevTrailing = trailing;
 	}
 	
 	String padXorString (String s) {
@@ -99,7 +122,7 @@ public class GorillaCompressor {
 		int ret = 0;
 		int len = s.length();
 		for(int i = 0; i < len; i++) {
-			if(s.charAt(i)== '0') {
+			if(s.charAt(i) == '0') {
 				ret++;
 			} else {
 				return ret;
@@ -143,6 +166,7 @@ public class GorillaCompressor {
 			bitBuffer = "";
 		}
 		bitBuffer += c;
+		numWritten++;
 	}
 	
 	void addBits (String s) {

@@ -8,13 +8,13 @@ import java.util.Arrays;
 public class GorillaDecompressor {
 	
 	ByteBuffer input;
-	String inputString = "";
+	String inputString;
 	int numExtra;
 	boolean first = true;
 	ArrayList<Double> doubleList = new ArrayList<Double>();
 	String nextBit;
 	double prev;
-	int prevLeading;
+	int prevLeading = 17;
 	int prevTrailing;
 	int numMeaningful;
 	
@@ -29,9 +29,9 @@ public class GorillaDecompressor {
 		//System.out.println(inputString);
 		while(inputString.length() != 0) {
 			double decompressed = decompressOne();
-			System.out.println(decompressed);
-			if(decompressed == 2.0537059) {
-				System.out.println("Hit");
+			//System.out.println(decompressed);
+			if(decompressed == -0.999456909) {
+				//System.out.println("Hit");
 			}
 			doubleList.add(decompressed);
 		}
@@ -62,7 +62,10 @@ public class GorillaDecompressor {
 				} else {
 					prevLeading = Integer.parseInt(nextN(5), 2);
 					numMeaningful = Integer.parseInt(nextN(6), 2);
-					prevTrailing = 16 - prevLeading - numMeaningful;
+					prevTrailing = 8 - prevLeading - numMeaningful;
+					if(prevTrailing < 0) {
+						System.out.println("Hit");
+					}
 					return generateDouble();
 				}
 			}
@@ -77,6 +80,7 @@ public class GorillaDecompressor {
 	}
 	
 	double generateDouble () {
+		//int adjustedNumMeaningful = (numMeaningful % 2 == 0) ? numMeaningful : (numMeaningful + 1);
 		String meaningful = nextN(numMeaningful * 8);
 		double xor = constructXor(prevTrailing, prevLeading, meaningful);
 		double ret = Util.xorDoubles(prev, xor);
@@ -85,17 +89,22 @@ public class GorillaDecompressor {
 	}
 	
 	double constructXor(int trailing, int leading, String meaningful) {
-		byte[] array = new byte[16];
+		byte[] array = new byte[8];
+		//int num = (int) Math.ceil(numMeaningful/2.0);
 		for(int i = 0; i < numMeaningful; i++) {
 			String sub = meaningful.substring(i * 8, (i+1)*8);
 			//System.out.println(Long.parseLong(sub, 2));
+//			int index = ((int) Math.ceil((i+1+trailing)/2.0)) - 1;
+//			if(index == -16) {
+//				System.out.println("Hit");
+//			}
 			array[i+trailing] = (byte) Integer.parseInt(sub, 2);
 		}
-		byte[] eightArray = new byte[8];
-		for(int i = 0; i < 8; i++) {
-			eightArray[i] = (byte) (array[i*2] * 16 + array[i*2+1]);
-		}
-		return Util.toDouble(eightArray);
+//		byte[] eightArray = new byte[8];
+//		for(int i = 0; i < 8; i++) {
+//			eightArray[i] = (byte) (array[i*2] * 16 + array[i*2+1]);
+//		}
+		return Util.toDouble(array);
 	}
 	
 	String signExtend(String str){
@@ -126,33 +135,27 @@ public class GorillaDecompressor {
 	
 	void constructInputString () {
 		
+		StringBuilder inputStringBuilder = new StringBuilder("");
 		int len = input.capacity();
 		for(int i = 0; i < len; i++) {
 			if(i == len-1) {
 				numExtra = input.get();
 			} else {
-				inputString += byteToBits(input.get());
+				inputStringBuilder.append(byteToBits(input.get()));
 			}
 		}
+		int stringLen = inputStringBuilder.length();
 		//System.out.println(inputString.length());
-		//fixNumExtra();
-		inputString = inputString.substring(0, inputString.length() - numExtra);
+		inputStringBuilder.delete(stringLen - numExtra, stringLen);
+		inputString = inputStringBuilder.toString();
 		//System.out.println(inputString.length());
 		input = null;
 		
 	}
 	
-	void fixNumExtra () {
-		String reversed = new StringBuilder(inputString).reverse().toString();
-		int i = 0;
-		while(reversed.charAt(i) == '0') {
-			i++;
-		}
-		numExtra = Math.min(i, numExtra);
-	}
-	
 	String byteToBits (byte b) {
-		return String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
+		//return String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
+		return Integer.toBinaryString((b & 0xFF) + 0x100).substring(1);
 	}
 	
 }

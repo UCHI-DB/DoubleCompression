@@ -23,17 +23,23 @@ public class Main {
 //			new File(System.getProperty("user.dir") + "/output/" + name).mkdir();
 //		}
 		
-		String name = "Haptics_103";
-		
-		try {
-			double[] raw = Reader.readRaw(rawPathify(name));
-			writeCompressedToFile(compressFile(name, "Gorilla"), name, false);
-			double[] decompressed = decompressFile(name, "Gorilla");
-			writeUncompressedToFile(decompressed, "test");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		String name = "Haptics_103";
+//		
+//		try {
+//			double[] raw = Reader.readRaw(rawPathify(name));
+//			double[] decompressed = directDecompress(compressFile(name, "Gorilla"),"Gorilla");
+//			int len = raw.length;
+//			boolean correct = true;
+//			for(int i = 0; i < len; i++) {
+//				if(raw[i] != decompressed[i]) {
+//					correct = false;
+//				}
+//			}
+//			System.out.println(correct);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 //		try {
 //			String[] results = testReport("Haptics_12", "Gorilla");
@@ -51,6 +57,10 @@ public class Main {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
+		
+//		byte[] arr = Util.toByteArray(2.73862637264295E-310);
+//		double ret = Util.toDouble(arr);
+//		System.out.println(ret);
 		
 //		double[] data = new double[] {12,12,24,15,12,35};
 //		try {
@@ -325,12 +335,12 @@ public class Main {
 	}
 	
 	static String[][] fullTestReport (String method) throws IOException{
-		String[] names = allFileNames();
-//		String[] namesFull = allFileNames();
-//		String[] names = new String[1000];
-//		for(int i = 0; i < 1000; i++) {
-//			names[i] = namesFull[i];
-//		}
+//		String[] names = allFileNames();
+		String[] namesFull = allFileNames();
+		String[] names = new String[50];
+		for(int i = 0; i < 50; i++) {
+			names[i] = namesFull[i];
+		}
 		int len = names.length;
 		String[][] ret = new String[len+1][6];
 		System.out.println("Beginning testing!");
@@ -340,7 +350,7 @@ public class Main {
 		for(int i = 0; i < len; i++) {
 			System.out.println("Decompressing " + names[i]);
 			ret[i+1] = testReport(names[i],method);
-			System.out.println((i+1) + " / " + len + " tested");
+			//System.out.println((i+1) + " / " + len + " tested");
 		}
 		System.out.println("Done!");
 		return ret;
