@@ -33,12 +33,8 @@ public class GorillaCompressor {
 	}
 	
 	void compressOne(double d) throws IOException {
-		//ByteBuffer b = ByteBuffer.allocate(8);
 		double xored = Util.xorDoubles(d, prev);
 		byte[] arr = Util.toByteArray(xored);
-		//b.putDouble(xored);
-		//b.flip();
-		//String xorString = padXorString(String.format("0x%X", b.getLong()));
 		if(first == true) {
 			addBytes(Util.toByteArray(d));
 			first = false;
@@ -51,7 +47,6 @@ public class GorillaCompressor {
 				int leading = leadingZeroes(arr);
 				int trailing = trailingZeroes(arr);
 				byte[] meaningful = meaningful(arr, leading, trailing);
-				int meaningfulLen = meaningful.length;
 				if(leading == prevLeading && trailing == prevTrailing) {
 					addBit('0');
 					for(byte b : meaningful) {
@@ -60,6 +55,7 @@ public class GorillaCompressor {
 				} else {
 					addBit('1');
 					addInt(leading, 5);
+					int meaningfulLen = meaningful.length;
 					addInt(meaningfulLen, 6);
 					for(byte b : meaningful) {
 						addByte(b);
@@ -76,47 +72,14 @@ public class GorillaCompressor {
 		prevTrailing = trailing;
 	}
 	
-	String padXorString (String s) {
-		int missing = 18 - s.length();
-		String ret = "";
-		for(int i = 0; i < missing; i++) {
-			ret += "0";
-		}
-		ret += s.substring(2);
-		return ret;
-	}
-	
 	String padLength (String s, int targetLen) {
 		int len = s.length();
 		int toAdd = targetLen - len;
 		char[] padArray = new char[toAdd];
 		Arrays.fill(padArray, '0');
 		String padString = new String(padArray);
-//		String ret = "";
-//		for(int i = 0; i < toAdd; i++) {
-//			ret += "0";
-//		}
-//		ret += s;
-		
 		return padString + s;
 	}
-	
-//	int trailingZeroes (String s) {
-//		int ret = 0;
-//		int len = s.length();
-//		for(int i = 0; i < len; i++) {
-//			if(s.charAt(i) == '0') {
-//				ret++;
-//			} else {
-//				return ret;
-//			}
-//		}
-//		return ret;
-//	}
-//	
-//	int leadingZeroes (String s) {
-//		return trailingZeroes(new StringBuilder(s).reverse().toString());
-//	}
 	
 	int trailingZeroes (byte[] bs) {
 		int len = bs.length;
@@ -143,16 +106,6 @@ public class GorillaCompressor {
 		}
 		return ret;
 	}
-	
-	String meaningfulPrev (String s) {
-		int len = s.length();
-		return s.substring(prevTrailing, len - prevLeading);
-	}
-	
-//	String meaningful (String s) {
-//		int len = s.length();
-//		return s.substring(trailingZeroes(s), len - leadingZeroes(s));
-//	}
 	
 	byte[] meaningful (byte[] input, int leading, int trailing) {
 		return Arrays.copyOfRange(input, trailing, input.length - leading);

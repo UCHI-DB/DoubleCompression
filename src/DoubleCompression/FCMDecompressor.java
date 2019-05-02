@@ -1,7 +1,6 @@
 package DoubleCompression;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FCMDecompressor {

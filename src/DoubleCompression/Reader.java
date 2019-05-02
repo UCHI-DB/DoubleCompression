@@ -18,8 +18,6 @@ public class Reader {
 		
 			BufferedReader reader = new BufferedReader(new FileReader(f)); 
         	String[] line = reader.readLine().split(",");
-//        	ArrayList<String> firstRemoved = new ArrayList<String>(Arrays.asList(line));
-//        	firstRemoved.remove(0);
         	double[] asDoubles = Arrays.stream(line).mapToDouble(num -> Double.parseDouble(num)).toArray();
         	reader.close();
             return asDoubles;
