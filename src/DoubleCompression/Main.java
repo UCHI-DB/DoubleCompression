@@ -2,7 +2,6 @@ package DoubleCompression;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -50,13 +49,17 @@ public class Main {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-			
-//		try {
-//			generateReport("Gorilla");
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
+		
+//		byte b = 9;
+//		for(int i = 7; i >= 0; i--) {
+//			System.out.println((b & (1 << i)) >> i);
 //		}
+			
+		try {
+			generateReport("Gorilla");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 //		byte[] arr = Util.toByteArray(2.73862637264295E-310);
 //		double ret = Util.toDouble(arr);
@@ -337,8 +340,9 @@ public class Main {
 	static String[][] fullTestReport (String method) throws IOException{
 //		String[] names = allFileNames();
 		String[] namesFull = allFileNames();
-		String[] names = new String[50];
-		for(int i = 0; i < 50; i++) {
+		int numToTest = 1000;
+		String[] names = new String[numToTest];
+		for(int i = 0; i < numToTest; i++) {
 			names[i] = namesFull[i];
 		}
 		int len = names.length;
@@ -348,9 +352,9 @@ public class Main {
 				"Compression Throughput (mb/s)", "Decompression Throughput (mb/s)",
 				"Compression Ratio", "Method"};
 		for(int i = 0; i < len; i++) {
-			System.out.println("Decompressing " + names[i]);
+			//System.out.println("Decompressing " + names[i]);
 			ret[i+1] = testReport(names[i],method);
-			//System.out.println((i+1) + " / " + len + " tested");
+			System.out.println((i+1) + " / " + len + " tested");
 		}
 		System.out.println("Done!");
 		return ret;

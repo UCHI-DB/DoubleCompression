@@ -3,6 +3,7 @@ package DoubleCompression;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class GorillaCompressor {
 	
@@ -11,9 +12,9 @@ public class GorillaCompressor {
 	int prevTrailing = 0;
 	boolean first = true;
 	double[] input;
-	String bitBuffer = "";
+	byte buf = 0;
+	byte posInBuf = 7;
 	ByteArrayOutputStream ret = new ByteArrayOutputStream();
-	int numWritten = 0;
 	
 	public GorillaCompressor (double[] input) {
 		this.input = input;
@@ -22,12 +23,10 @@ public class GorillaCompressor {
 	public ByteBuffer compress() throws IOException {
 		for(double d : input) {
 			//System.out.println("Compressing " + d);
-			if(d == -0.999456909) {
-				//System.out.println("Hit");
-			}
-			numWritten = 0;
+//			if(d == -0.999456909) {
+//				System.out.println("Hit");
+//			}
 			compressOne(d);
-			//System.out.println(numWritten);
 		}
 		flush();
 		return ByteBuffer.wrap(ret.toByteArray());
@@ -40,7 +39,6 @@ public class GorillaCompressor {
 		b.putDouble(xored);
 		b.flip();
 		String xorString = padXorString(String.format("0x%X", b.getLong()));
-		//System.out.println(xorString);
 		if(first == true) {
 			addBytes(Util.toByteArray(d));
 			first = false;
@@ -71,9 +69,6 @@ public class GorillaCompressor {
 						String sub = meaningful.substring(i*2,i*2+2);
 						addInt(Integer.parseInt(sub, 16), 8);
 					}
-//					for(char c : meaningfulPrev(xorString).toCharArray()) {
-//						addInt(Character.digit(c, 16), 8);
-//					}
 				} else {
 					addBit('1');
 					addInt(leading, 5);
@@ -82,9 +77,6 @@ public class GorillaCompressor {
 						String sub = meaningful.substring(i*2,i*2+2);
 						addInt(Integer.parseInt(sub, 16), 8);
 					}
-//					for(char c : meaningful.toCharArray()) {
-//						addInt(Character.digit(c, 16), 8);
-//					}
 				}
 				setPrev(d, leading, trailing);
 			}
@@ -110,12 +102,16 @@ public class GorillaCompressor {
 	String padLength (String s, int targetLen) {
 		int len = s.length();
 		int toAdd = targetLen - len;
-		String ret = "";
-		for(int i = 0; i < toAdd; i++) {
-			ret += "0";
-		}
-		ret += s;
-		return ret;
+		char[] padArray = new char[toAdd];
+		Arrays.fill(padArray, '0');
+		String padString = new String(padArray);
+//		String ret = "";
+//		for(int i = 0; i < toAdd; i++) {
+//			ret += "0";
+//		}
+//		ret += s;
+		
+		return padString + s;
 	}
 	
 	int trailingZeroes (String s) {
@@ -146,27 +142,24 @@ public class GorillaCompressor {
 	}
 	
 	void flush () {
-		int numToAdd = 8 - bitBuffer.length();
+		int numToAdd = posInBuf + 1;
 		if(numToAdd == 8) {
 			numToAdd = 0;
 		}
-		for(int i = 0; i < numToAdd; i++) {
-			addBit('0');
-		}
-		ret.write((byte) Integer.parseInt(bitBuffer,2));
-//		if(bitBuffer.length() > 0) {
-//			ret.write(Byte.parseByte(bitBuffer,2));
-//		}
+		ret.write(buf);
 		ret.write(numToAdd);
 	}
 	
 	void addBit (char c) {
-		if(bitBuffer.length() == 8) {
-			ret.write(Integer.parseInt(bitBuffer,2));
-			bitBuffer = "";
+		if(posInBuf == -1) {
+			ret.write(buf);
+			buf = 0;
+			posInBuf = 7;
 		}
-		bitBuffer += c;
-		numWritten++;
+		if(c == '1') {
+			buf |= 1 << posInBuf;
+		}
+		posInBuf--;
 	}
 	
 	void addBits (String s) {
@@ -181,7 +174,11 @@ public class GorillaCompressor {
 	}
 	
 	void addByte (byte b) {
-		addBits(byteToBits(b));
+		for(int i = 7; i >= 0; i--) {
+			int bit = ((b & (1 << i)) >> i);
+			char asChar = (bit == 0) ? '0' : '1';
+			addBit(asChar);
+		}
 	}
 	
 	void addBytes (byte[] bs) {
