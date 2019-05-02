@@ -201,7 +201,6 @@ public class Main {
 			throws IOException {
 		
 		output = compressedPathify(output);
-		//File outputFile = new File(output);
         OutputStream outstream = Files.newOutputStream(Paths.get(output));
         if(flip) {
         	toWrite.flip();
@@ -340,7 +339,7 @@ public class Main {
 	static String[][] fullTestReport (String method) throws IOException{
 //		String[] names = allFileNames();
 		String[] namesFull = allFileNames();
-		int numToTest = 1000;
+		int numToTest = 2000;
 		String[] names = new String[numToTest];
 		for(int i = 0; i < numToTest; i++) {
 			names[i] = namesFull[i];
