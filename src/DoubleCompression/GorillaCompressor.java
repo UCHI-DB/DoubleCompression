@@ -33,12 +33,12 @@ public class GorillaCompressor {
 	}
 	
 	void compressOne(double d) throws IOException {
-		ByteBuffer b = ByteBuffer.allocate(8);
+		//ByteBuffer b = ByteBuffer.allocate(8);
 		double xored = Util.xorDoubles(d, prev);
-		byte[] test = Util.toByteArray(xored);
-		b.putDouble(xored);
-		b.flip();
-		String xorString = padXorString(String.format("0x%X", b.getLong()));
+		byte[] arr = Util.toByteArray(xored);
+		//b.putDouble(xored);
+		//b.flip();
+		//String xorString = padXorString(String.format("0x%X", b.getLong()));
 		if(first == true) {
 			addBytes(Util.toByteArray(d));
 			first = false;
@@ -48,34 +48,21 @@ public class GorillaCompressor {
 				addBit('0');
 			} else {
 				addBit('1');
-				int leading = leadingZeroes(xorString);
-				int trailing = trailingZeroes(xorString);
-				String meaningful = meaningful(xorString);
-				int meaningfulLen = meaningful.length();
-				if(trailing % 2 == 1) {
-					meaningful = "0" + meaningful;
-					trailing -= 1;
-				} 
-				if(leading % 2 == 1) {
-					meaningful += 0;
-					leading -= 1;
-				}
-				meaningfulLen = meaningful.length() / 2;
-				leading /= 2;
-				trailing /= 2;
+				int leading = leadingZeroes(arr);
+				int trailing = trailingZeroes(arr);
+				byte[] meaningful = meaningful(arr, leading, trailing);
+				int meaningfulLen = meaningful.length;
 				if(leading == prevLeading && trailing == prevTrailing) {
 					addBit('0');
-					for(int i = 0; i < meaningfulLen; i++) {
-						String sub = meaningful.substring(i*2,i*2+2);
-						addInt(Integer.parseInt(sub, 16), 8);
+					for(byte b : meaningful) {
+						addByte(b);
 					}
 				} else {
 					addBit('1');
 					addInt(leading, 5);
 					addInt(meaningfulLen, 6);
-					for(int i = 0; i < meaningfulLen; i++) {
-						String sub = meaningful.substring(i*2,i*2+2);
-						addInt(Integer.parseInt(sub, 16), 8);
+					for(byte b : meaningful) {
+						addByte(b);
 					}
 				}
 				setPrev(d, leading, trailing);
@@ -114,11 +101,28 @@ public class GorillaCompressor {
 		return padString + s;
 	}
 	
-	int trailingZeroes (String s) {
+//	int trailingZeroes (String s) {
+//		int ret = 0;
+//		int len = s.length();
+//		for(int i = 0; i < len; i++) {
+//			if(s.charAt(i) == '0') {
+//				ret++;
+//			} else {
+//				return ret;
+//			}
+//		}
+//		return ret;
+//	}
+//	
+//	int leadingZeroes (String s) {
+//		return trailingZeroes(new StringBuilder(s).reverse().toString());
+//	}
+	
+	int trailingZeroes (byte[] bs) {
+		int len = bs.length;
 		int ret = 0;
-		int len = s.length();
 		for(int i = 0; i < len; i++) {
-			if(s.charAt(i) == '0') {
+			if(bs[i] == 0) {
 				ret++;
 			} else {
 				return ret;
@@ -127,8 +131,17 @@ public class GorillaCompressor {
 		return ret;
 	}
 	
-	int leadingZeroes (String s) {
-		return trailingZeroes(new StringBuilder(s).reverse().toString());
+	int leadingZeroes (byte[] bs) {
+		int len = bs.length - 1;
+		int ret = 0;
+		for(int i = len; i >= 0; i--) {
+			if(bs[i] == 0) {
+				ret++;
+			} else {
+				return ret;
+			}
+		}
+		return ret;
 	}
 	
 	String meaningfulPrev (String s) {
@@ -136,9 +149,13 @@ public class GorillaCompressor {
 		return s.substring(prevTrailing, len - prevLeading);
 	}
 	
-	String meaningful (String s) {
-		int len = s.length();
-		return s.substring(trailingZeroes(s), len - leadingZeroes(s));
+//	String meaningful (String s) {
+//		int len = s.length();
+//		return s.substring(trailingZeroes(s), len - leadingZeroes(s));
+//	}
+	
+	byte[] meaningful (byte[] input, int leading, int trailing) {
+		return Arrays.copyOfRange(input, trailing, input.length - leading);
 	}
 	
 	void flush () {

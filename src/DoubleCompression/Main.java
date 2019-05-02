@@ -23,7 +23,6 @@ public class Main {
 //		}
 		
 //		String name = "Haptics_103";
-//		
 //		try {
 //			double[] raw = Reader.readRaw(rawPathify(name));
 //			double[] decompressed = directDecompress(compressFile(name, "Gorilla"),"Gorilla");
