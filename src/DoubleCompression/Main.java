@@ -8,19 +8,21 @@ public class Main {
 	public static void main(String[] args) throws FileNotFoundException {
 
 		try {
-			Tester.generateReport("Gorilla");
+			Tester.generateReport("DFCM");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 //		String name = "Haptics_103";
 //		try {
+//			String method = "DFCMGorilla";
 //			double[] raw = Reader.readRaw(Util.rawPathify(name));
-//			double[] decompressed = Compressor.directDecompress(Compressor.compressFile(name, "Gorilla"),"Gorilla");
+//			double[] decompressed = Compressor.directDecompress(Compressor.compressFile(name, method),method);
 //			int len = raw.length;
 //			boolean correct = true;
 //			for(int i = 0; i < len; i++) {
 //				if(raw[i] != decompressed[i]) {
+//					//System.out.println(raw[i] + " = " + decompressed[i]);
 //					correct = false;
 //				}
 //			}

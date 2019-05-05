@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 
 public class Compressor {
 
-	static ByteBuffer genericFCMCompressFile(String f, boolean DFCM, double[] series)
+	static ByteBuffer genericFCMCompressFile(String f, boolean DFCM, boolean Gorilla, double[] series)
 			throws IOException {
 		
 		if(series == null) {
@@ -14,9 +14,17 @@ public class Compressor {
 		ByteBuffer compressed;
 		
 		if(DFCM) {
-			compressed = new DFCMCompressor(series).compress();
+			if(Gorilla) {
+				compressed = new GorillaCompressor(new DFCMCompressor(series).compressForGorilla()).compress();
+			} else {
+				compressed = new DFCMCompressor(series).compress();
+			}
 		} else {
-			compressed = new FCMCompressor(series).compress();
+			if(Gorilla) {
+				compressed = new GorillaCompressor(new FCMCompressor(series).compressForGorilla()).compress();
+			} else {
+				compressed = new FCMCompressor(series).compress();
+			}
 		}
 		
 		return compressed;
@@ -37,11 +45,15 @@ public class Compressor {
 			throws IOException {
 		switch(method) {
 			case "FCM":
-				return genericFCMCompressFile("", false, series);
+				return genericFCMCompressFile("", false, false, series);
 			case "DFCM":
-				return genericFCMCompressFile("", true, series);
+				return genericFCMCompressFile("", true, false, series);
 			case "Gorilla":
 				return gorillaCompressFile("", series);
+			case "FCMGorilla":
+				return genericFCMCompressFile("", false, true, series);
+			case "DFCMGorilla":
+				return genericFCMCompressFile("", true, true, series);
 			default:
 				return null;
 		}
@@ -53,11 +65,15 @@ public class Compressor {
 		f = Util.rawPathify(f);
 		switch(method) {
 			case "FCM":
-				return genericFCMCompressFile(f, false, null);
+				return genericFCMCompressFile(f, false, false, null);
 			case "DFCM":
-				return genericFCMCompressFile(f, true, null);
+				return genericFCMCompressFile(f, true, false, null);
 			case "Gorilla":
 				return gorillaCompressFile(f, null);
+			case "FCMGorilla":
+				return genericFCMCompressFile(f, false, true, null);
+			case "DFCMGorilla":
+				return genericFCMCompressFile(f, true, true, null);
 			default:
 				return null;
 		}
@@ -65,7 +81,7 @@ public class Compressor {
 	}
 
 	static double[] genericFCMDecompressFile(String f, boolean DFCM,
-			ByteBuffer compressed)
+			boolean Gorilla, ByteBuffer compressed)
 			throws IOException {
 		
 		if(compressed == null) {
@@ -74,9 +90,17 @@ public class Compressor {
 		
 		double[] decompressed;
 		if(DFCM) {
-			decompressed = new DFCMDecompressor(compressed).decompress();
+			if(Gorilla) {
+				decompressed = new DFCMDecompressor(null,new GorillaDecompressor(compressed).decompress()).decompressFromGorilla();
+			} else {
+				decompressed = new DFCMDecompressor(compressed,null).decompress();
+			}
 		} else {
-			decompressed = new FCMDecompressor(compressed).decompress();
+			if(Gorilla) {
+				decompressed = new FCMDecompressor(null,new GorillaDecompressor(compressed).decompress()).decompressFromGorilla();
+			} else {
+				decompressed = new FCMDecompressor(compressed,null).decompress();
+			}
 		}
 		
 		return decompressed;
@@ -98,11 +122,15 @@ public class Compressor {
 		
 		switch(method) {
 			case "FCM":
-				return genericFCMDecompressFile("", false, compressed);
+				return genericFCMDecompressFile("", false, false, compressed);
 			case "DFCM":
-				return genericFCMDecompressFile("", true, compressed);
+				return genericFCMDecompressFile("", true, false, compressed);
 			case "Gorilla":
 				return gorillaDecompressFile("", compressed);
+			case "FCMGorilla":
+				return genericFCMDecompressFile("", false, true, compressed);
+			case "DFCMGorilla":
+				return genericFCMDecompressFile("", true, true, compressed);
 			default:
 				return null;
 		}
@@ -115,11 +143,15 @@ public class Compressor {
 		f = Util.compressedPathify(f);
 		switch(method) {
 			case "FCM":
-				return genericFCMDecompressFile(f, false, null);
+				return genericFCMDecompressFile(f, false, false, null);
 			case "DFCM":
-				return genericFCMDecompressFile(f, true, null);
+				return genericFCMDecompressFile(f, true, false, null);
 			case "Gorilla":
 				return gorillaDecompressFile(f, null);
+			case "FCMGorilla":
+				return genericFCMDecompressFile(f, false, true, null);
+			case "DFCMGorilla":
+				return genericFCMDecompressFile(f, true, true, null);
 			default:
 				return null;
 		}

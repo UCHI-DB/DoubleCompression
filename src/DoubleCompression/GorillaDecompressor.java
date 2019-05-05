@@ -14,7 +14,7 @@ public class GorillaDecompressor {
 	ArrayList<Double> doubleList = new ArrayList<Double>();
 	String nextBit;
 	double prev;
-	int prevLeading = 17;
+	int prevLeading = 9;
 	int prevTrailing;
 	int numMeaningful;
 	
@@ -30,10 +30,10 @@ public class GorillaDecompressor {
 	public double[] decompress() {
 		while(pos < inputBitLen) {
 			double decompressed = decompressOne();
-			//System.out.println(decompressed);
-			if(decompressed == -0.999456909) {
-				//System.out.println("Hit");
-			}
+//			System.out.println("Decompressed " + decompressed);
+//			if(decompressed == -1.4457912) {
+//				System.out.println("Hit");
+//			}
 			doubleList.add(decompressed);
 		}
 		int len = doubleList.size();
@@ -114,9 +114,7 @@ public class GorillaDecompressor {
 	
 	double constructXor(int trailing, int leading, ByteBuffer meaningful) {
 		byte[] array = new byte[8];
-		for(int i = 0; i < numMeaningful; i++) {
-			array[i+trailing] = meaningful.get();
-		}
+		meaningful.get(array, trailing, numMeaningful);
 		return Util.toDouble(array);
 	}
 	

@@ -27,4 +27,8 @@ public class DFCMCompressor {
 		return new FCMCompressor(convert()).compress();
 	}
 	
+	public double[] compressForGorilla() {
+		return new FCMCompressor(convert()).compressForGorilla();
+	}
+	
 }

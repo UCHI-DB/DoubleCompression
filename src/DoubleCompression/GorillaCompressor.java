@@ -8,8 +8,8 @@ import java.util.Arrays;
 public class GorillaCompressor {
 	
 	double prev = 0.0;
-	int prevLeading = 17;
-	int prevTrailing = 0;
+	byte prevLeading = 9;
+	byte prevTrailing = 9;
 	boolean first = true;
 	double[] input;
 	byte buf = 0;
@@ -23,7 +23,7 @@ public class GorillaCompressor {
 	public ByteBuffer compress() throws IOException {
 		for(double d : input) {
 			//System.out.println("Compressing " + d);
-//			if(d == -0.999456909) {
+//			if(d == -1.2930638) {
 //				System.out.println("Hit");
 //			}
 			compressOne(d);
@@ -44,41 +44,30 @@ public class GorillaCompressor {
 				addBit('0');
 			} else {
 				addBit('1');
-				int leading = leadingZeroes(arr);
-				int trailing = trailingZeroes(arr);
-				byte[] meaningful = meaningful(arr, leading, trailing);
-				if(leading == prevLeading && trailing == prevTrailing) {
+				byte leading = (byte) leadingZeroes(arr);
+				byte trailing = (byte) trailingZeroes(arr);
+				if(leading >= prevLeading && trailing >= prevTrailing) {
 					addBit('0');
-					for(byte b : meaningful) {
-						addByte(b);
-					}
+					byte[] meaningful = meaningful(arr, prevLeading, prevTrailing);
+					addBytes(meaningful);
+					prev = d;
 				} else {
 					addBit('1');
-					addInt(leading, 5);
-					int meaningfulLen = meaningful.length;
-					addInt(meaningfulLen, 6);
-					for(byte b : meaningful) {
-						addByte(b);
-					}
+					addByte(leading, 5);
+					byte[] meaningful = meaningful(arr, leading, trailing);
+					byte meaningfulLen = (byte) meaningful.length;
+					addByte(meaningfulLen, 6);
+					addBytes(meaningful);
+					setPrev(d, leading, trailing);
 				}
-				setPrev(d, leading, trailing);
 			}
 		}
 	}
 	
-	void setPrev (double d, int leading, int trailing) {
+	void setPrev (double d, byte leading, byte trailing) {
 		prev = d;
 		prevLeading = leading;
 		prevTrailing = trailing;
-	}
-	
-	String padLength (String s, int targetLen) {
-		int len = s.length();
-		int toAdd = targetLen - len;
-		char[] padArray = new char[toAdd];
-		Arrays.fill(padArray, '0');
-		String padString = new String(padArray);
-		return padString + s;
 	}
 	
 	int trailingZeroes (byte[] bs) {
@@ -139,12 +128,13 @@ public class GorillaCompressor {
 		}
 	}
 	
-	void addInt (int i, int len) {
-		addBits(padLength(Integer.toBinaryString(i), len));
+	void addByte (byte b) {
+		addByte(b, 8);
 	}
 	
-	void addByte (byte b) {
-		for(int i = 7; i >= 0; i--) {
+	void addByte (byte b, int n) {
+		n--;
+		for(int i = n; i >= 0; i--) {
 			int bit = ((b & (1 << i)) >> i);
 			char asChar = (bit == 0) ? '0' : '1';
 			addBit(asChar);
@@ -155,9 +145,5 @@ public class GorillaCompressor {
 		for(byte b : bs) {
 			addByte(b);
 		}
-	}
-	
-	String byteToBits (byte b) {
-		return String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
 	}
 }

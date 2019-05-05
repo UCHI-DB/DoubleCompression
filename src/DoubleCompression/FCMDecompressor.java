@@ -5,24 +5,33 @@ import java.util.HashMap;
 
 public class FCMDecompressor {
 	
-	ByteBuffer input;
+	ByteBuffer byteInput;
+	double[] doubleInput;
 	double[] output;
 	HashMap<Double[], Double> map;
 	int count;
 	double actual;
+	int len;
 	
-	public FCMDecompressor(ByteBuffer input) {
-		this.input = input;
-		if(this.input.position() != 0) {
-			this.input.flip();
+	public FCMDecompressor(ByteBuffer byteInput, double[] doubleInput) {
+		if(byteInput != null) {
+			this.byteInput = byteInput;
+			if(this.byteInput.position() != 0) {
+				this.byteInput.flip();
+			}
+			this.output = new double[byteInput.capacity()/8];
+			this.map = new HashMap<Double[], Double>();
+			this.count = 0;
 		}
-		this.output = new double[input.capacity()/8];
-		this.map = new HashMap<Double[], Double>();
-		this.count = 0;
+		if(doubleInput != null) {
+			this.doubleInput = doubleInput;
+			this.len = doubleInput.length;
+			this.output = new double[len];
+		}
 	}
 	
 	public double[] decompress() {
-		while(input.position() < input.capacity()) {
+		while(byteInput.position() < byteInput.capacity()) {
 			output[count] = decompressOne();
 			count++;
 		}
@@ -30,11 +39,22 @@ public class FCMDecompressor {
 	}
 	
 	double decompressOne() {
-		actual = input.getDouble();
+		actual = byteInput.getDouble();
 		Double prediction = predict();
-		
-		return Util.toDouble(
-				Util.xor(Util.toByteArray(actual), Util.toByteArray(prediction)));
+		return Util.xorDoubles(actual, prediction);
+	}
+	
+	public double[] decompressFromGorilla() {
+		for(int i = 0; i < len; i++) {
+			output[i] = decompressOneFromGorilla(doubleInput[i]);
+		}
+		return output;
+	}
+	
+	double decompressOneFromGorilla (double input) {
+		Double prediction = predict();
+		return Util.xorDoubles(input, prediction);
+
 	}
 	
 	Double[] getPrev() {

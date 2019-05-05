@@ -4,10 +4,12 @@ import java.nio.ByteBuffer;
 
 public class DFCMDecompressor {
 
-	ByteBuffer input;
+	ByteBuffer byteInput;
+	double[] doubleInput;
 	
-	public DFCMDecompressor (ByteBuffer input) {
-		this.input = input;
+	public DFCMDecompressor (ByteBuffer byteInput, double[] doubleInput) {
+		this.byteInput = byteInput;
+		this.doubleInput = doubleInput;
 	}
 	
 	double[] convertBack (double[] input) {
@@ -23,7 +25,12 @@ public class DFCMDecompressor {
 	}
 	
 	public double[] decompress() {
-		double[] decompressed = new FCMDecompressor(input).decompress();
+		double[] decompressed = new FCMDecompressor(byteInput,null).decompress();
+		return convertBack(decompressed);
+	}
+	
+	public double[] decompressFromGorilla() {
+		double[] decompressed = new FCMDecompressor(null,doubleInput).decompressFromGorilla();
 		return convertBack(decompressed);
 	}
 	

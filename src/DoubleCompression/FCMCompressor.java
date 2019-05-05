@@ -33,6 +33,24 @@ public class FCMCompressor {
 		}
 	}
 	
+	public double[] compressForGorilla() {
+		int len = input.length;
+		double[] ret = new double[len];
+		for(int i = 0; i < len; i++) {
+			ret[i] = compressOneForGorilla(input[i]);
+		}
+		return ret;
+	}
+	
+	double compressOneForGorilla(double d) {
+		Double prediction = predict();
+		if(prediction == null) {
+			return d;
+		} else {
+			return Util.xorDoubles(d, prediction);
+		}
+	}
+	
 	Double[] getPrev() {
 		if(count >= 3) {
 			Double[] ret = {input[count-3], input[count-2], input[count-1]};

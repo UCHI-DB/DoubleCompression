@@ -16,8 +16,9 @@ public class Tester {
 
 	static String[] testReport (String name, String method) throws IOException {
 		String[] ret = new String[6];
+		double[] data = Reader.readRaw(Util.rawPathify(name));
 		long compressionStartTime = System.nanoTime();
-		ByteBuffer compressed = Compressor.compressFile(name, method);
+		ByteBuffer compressed = Compressor.directCompress(data, method);
 		long compressionEndTime = System.nanoTime();
 		double[] decompressed = Compressor.directDecompress(compressed, method);
 		long decompressionEndTime = System.nanoTime();
@@ -43,12 +44,12 @@ public class Tester {
 
 	static String[][] fullTestReport (String method) throws IOException{
 			String[] names = Util.allFileNames();
-	//		String[] namesFull = allFileNames();
-	//		int numToTest = 2000;
-	//		String[] names = new String[numToTest];
-	//		for(int i = 0; i < numToTest; i++) {
-	//			names[i] = namesFull[i];
-	//		}
+//			String[] namesFull = Util.allFileNames();
+//			int numToTest = 10000;
+//			String[] names = new String[numToTest];
+//			for(int i = 0; i < numToTest; i++) {
+//				names[i] = namesFull[i];
+//			}
 			int len = names.length;
 			String[][] ret = new String[len+1][6];
 			System.out.println("Beginning testing!");
