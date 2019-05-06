@@ -2,6 +2,7 @@ package DoubleCompression;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Main {
 
@@ -22,7 +23,7 @@ public class Main {
 //			boolean correct = true;
 //			for(int i = 0; i < len; i++) {
 //				if(raw[i] != decompressed[i]) {
-//					//System.out.println(raw[i] + " = " + decompressed[i]);
+//					System.out.println(raw[i] + " = " + decompressed[i]);
 //					correct = false;
 //				}
 //			}
@@ -32,9 +33,9 @@ public class Main {
 //			e.printStackTrace();
 //		}
 
-//		double[] data = new double[] {12,12,24,15,12,35};
+//		double[] data = new double[] {1,2,3,4,5};
 //		try {
-//			double[] decompressed = Compressor.directDecompress(Compressor.directCompress(data, "Gorilla"),"Gorilla");
+//			double[] decompressed = Compressor.directDecompress(Compressor.directCompress(data, "DFCMGorilla"),"DFCMGorilla");
 //			System.out.println("Hi");
 //		} catch (IOException e) {
 //			// TODO Auto-generated catch block

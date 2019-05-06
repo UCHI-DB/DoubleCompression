@@ -1,6 +1,8 @@
 package DoubleCompression;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class FCMDecompressor {
@@ -8,7 +10,7 @@ public class FCMDecompressor {
 	ByteBuffer byteInput;
 	double[] doubleInput;
 	double[] output;
-	HashMap<Double[], Double> map;
+	HashMap<ArrayList<Double>, Double> map;
 	int count;
 	double actual;
 	int len;
@@ -20,19 +22,22 @@ public class FCMDecompressor {
 				this.byteInput.flip();
 			}
 			this.output = new double[byteInput.capacity()/8];
-			this.map = new HashMap<Double[], Double>();
+			this.map = new HashMap<ArrayList<Double>, Double>();
 			this.count = 0;
 		}
 		if(doubleInput != null) {
 			this.doubleInput = doubleInput;
 			this.len = doubleInput.length;
 			this.output = new double[len];
+			this.map = new HashMap<ArrayList<Double>, Double>();
+			this.count = 0;
 		}
 	}
 	
 	public double[] decompress() {
 		while(byteInput.position() < byteInput.capacity()) {
 			output[count] = decompressOne();
+			update();
 			count++;
 		}
 		return output;
@@ -46,7 +51,10 @@ public class FCMDecompressor {
 	
 	public double[] decompressFromGorilla() {
 		for(int i = 0; i < len; i++) {
-			output[i] = decompressOneFromGorilla(doubleInput[i]);
+			actual = doubleInput[i];
+			output[i] = decompressOneFromGorilla(actual);
+			update();
+			count++;
 		}
 		return output;
 	}
@@ -57,9 +65,9 @@ public class FCMDecompressor {
 
 	}
 	
-	Double[] getPrev() {
+	ArrayList<Double> getPrev() {
 		if(count >= 3) {
-			Double[] ret = {output[count-3], output[count-2], output[count-1]};
+			ArrayList<Double> ret = new ArrayList<Double>(Arrays.asList(Double.valueOf(output[count-3]), Double.valueOf(output[count-2]), Double.valueOf(output[count-1])));
 			return ret;
 		} else {
 			return null;
@@ -77,7 +85,7 @@ public class FCMDecompressor {
 	}
 	
 	void update() {
-		Double[] prev = getPrev();
+		ArrayList<Double> prev = getPrev();
 		if(prev != null) {
 			map.put(getPrev(), actual);
 		}

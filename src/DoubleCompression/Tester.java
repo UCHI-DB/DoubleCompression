@@ -45,23 +45,23 @@ public class Tester {
 	static String[][] fullTestReport (String method) throws IOException{
 			String[] names = Util.allFileNames();
 //			String[] namesFull = Util.allFileNames();
-//			int numToTest = 10000;
+//			int numToTest = 1000;
 //			String[] names = new String[numToTest];
 //			for(int i = 0; i < numToTest; i++) {
 //				names[i] = namesFull[i];
 //			}
 			int len = names.length;
 			String[][] ret = new String[len+1][6];
-			System.out.println("Beginning testing!");
+			//System.out.println("Beginning testing!");
 			ret[0] = new String[] {"File Name", "File Size (kb)", 
 					"Compression Throughput (mb/s)", "Decompression Throughput (mb/s)",
 					"Compression Ratio", "Method"};
 			for(int i = 0; i < len; i++) {
 				//System.out.println("Decompressing " + names[i]);
 				ret[i+1] = testReport(names[i],method);
-				System.out.println((i+1) + " / " + len + " tested");
+				//System.out.println((i+1) + " / " + len + " tested");
 			}
-			System.out.println("Done!");
+			//System.out.println("Done!");
 			return ret;
 		}
 

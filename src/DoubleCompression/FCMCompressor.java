@@ -1,17 +1,23 @@
 package DoubleCompression;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class FCMCompressor {
 	
 	double[] input;
-	HashMap<Double[], Double> map;
-	int count;
+	int len;
+	HashMap<ArrayList<Double>, Double> map;
+	int count = 0;
+	double matches = 0;
+	double perfectMatches = 0;
 	
 	public FCMCompressor(double[] input) {
 		this.input = input;
-		this.map = new HashMap<Double[], Double>();
+		this.len = input.length;
+		this.map = new HashMap<ArrayList<Double>, Double>();
 		this.count = 0;
 	}
 	
@@ -19,8 +25,12 @@ public class FCMCompressor {
 		ByteBuffer ret = ByteBuffer.allocate(8 * input.length);
 		for(double d : input) {
 			ret.put(compressOne(d));
+			update();
 			count++;
 		}
+		System.out.println(Math.round(10000.0 * matches / count) / 100.0 + "," +
+				Math.round(10000.0 * perfectMatches / count) / 100.0);
+
 		return ret;
 	}
 	
@@ -29,6 +39,10 @@ public class FCMCompressor {
 		if(prediction == null) {
 			return Util.toByteArray(d);
 		} else {
+			matches++;
+			if(d == prediction) {
+				perfectMatches++;
+			}
 			return Util.xor(Util.toByteArray(d), Util.toByteArray(prediction));
 		}
 	}
@@ -38,6 +52,8 @@ public class FCMCompressor {
 		double[] ret = new double[len];
 		for(int i = 0; i < len; i++) {
 			ret[i] = compressOneForGorilla(input[i]);
+			update();
+			count++;
 		}
 		return ret;
 	}
@@ -51,9 +67,9 @@ public class FCMCompressor {
 		}
 	}
 	
-	Double[] getPrev() {
+	ArrayList<Double> getPrev() {
 		if(count >= 3) {
-			Double[] ret = {input[count-3], input[count-2], input[count-1]};
+			ArrayList<Double> ret = new ArrayList<Double>(Arrays.asList(Double.valueOf(input[count-3]), Double.valueOf(input[count-2]), Double.valueOf(input[count-1])));
 			return ret;
 		} else {
 			return null;
@@ -69,12 +85,17 @@ public class FCMCompressor {
 	}
 	
 	Double actual() {
-		return input[count];
+		if(count < len) {
+			return input[count];
+		} else {
+			return null;
+		}
 	}
 	
 	void update() {
-		Double[] prev = getPrev();
-		if(prev != null) {
+		ArrayList<Double> prev = getPrev();
+		Double actual = actual();
+		if(prev != null && actual != null) {
 			map.put(getPrev(), actual());
 		}
 	}
