@@ -9,7 +9,6 @@ public class GorillaDecompressor {
 	int inputByteLen;
 	int inputBitLen;
 	int pos = 0;
-	int numExtra;
 	boolean first = true;
 	ArrayList<Double> doubleList = new ArrayList<Double>();
 	String nextBit;
@@ -23,7 +22,7 @@ public class GorillaDecompressor {
 		inputBitLen = inputByteLen * 8;
 		inputArray = new byte[inputByteLen];
 		input.get(inputArray);
-		numExtra = inputArray[inputByteLen-1];
+		int numExtra = inputArray[inputByteLen-1];
 		inputBitLen -= numExtra + 8;
 	}
 	

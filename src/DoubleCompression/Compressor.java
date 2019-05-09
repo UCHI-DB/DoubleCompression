@@ -40,6 +40,16 @@ public class Compressor {
 		return new GorillaCompressor(series).compress();
 		
 	}
+	
+	static ByteBuffer sprintzCompressFile(String f, double[] series)
+			throws IOException {
+		
+		if(series == null) {
+			series = Reader.readRaw(f);
+		}
+		return new SprintzCompressor(series).compress();
+		
+	}
 
 	static ByteBuffer directCompress(double[] series, String method)
 			throws IOException {
@@ -50,6 +60,8 @@ public class Compressor {
 				return genericFCMCompressFile("", true, false, series);
 			case "Gorilla":
 				return gorillaCompressFile("", series);
+			case "Sprintz":
+				return sprintzCompressFile("", series);
 			case "FCMGorilla":
 				return genericFCMCompressFile("", false, true, series);
 			case "DFCMGorilla":
@@ -70,6 +82,8 @@ public class Compressor {
 				return genericFCMCompressFile(f, true, false, null);
 			case "Gorilla":
 				return gorillaCompressFile(f, null);
+			case "Sprintz":
+				return sprintzCompressFile(f, null);
 			case "FCMGorilla":
 				return genericFCMCompressFile(f, false, true, null);
 			case "DFCMGorilla":
@@ -116,6 +130,16 @@ public class Compressor {
 		return new GorillaDecompressor(compressed).decompress();
 		
 	}
+	
+	static double[] sprintzDecompressFile(String f, ByteBuffer compressed)
+			throws IOException {
+		
+		if(compressed == null) {
+			compressed = Reader.readCompressed(f);
+		}
+		return new SprintzDecompressor(compressed).decompress();
+		
+	}
 
 	static double[] directDecompress(ByteBuffer compressed, String method) 
 			throws IOException {
@@ -127,6 +151,8 @@ public class Compressor {
 				return genericFCMDecompressFile("", true, false, compressed);
 			case "Gorilla":
 				return gorillaDecompressFile("", compressed);
+			case "Sprintz":
+				return sprintzDecompressFile("", compressed);
 			case "FCMGorilla":
 				return genericFCMDecompressFile("", false, true, compressed);
 			case "DFCMGorilla":
@@ -148,6 +174,8 @@ public class Compressor {
 				return genericFCMDecompressFile(f, true, false, null);
 			case "Gorilla":
 				return gorillaDecompressFile(f, null);
+			case "Sprintz":
+				return sprintzDecompressFile(f, null);
 			case "FCMGorilla":
 				return genericFCMDecompressFile(f, false, true, null);
 			case "DFCMGorilla":

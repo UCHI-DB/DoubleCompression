@@ -59,11 +59,39 @@ public class Tester {
 			for(int i = 0; i < len; i++) {
 				//System.out.println("Decompressing " + names[i]);
 				ret[i+1] = testReport(names[i],method);
-				//System.out.println((i+1) + " / " + len + " tested");
+				System.out.println((i+1) + " / " + len + " tested");
 			}
 			//System.out.println("Done!");
 			return ret;
 		}
+	
+	public static void testCorrectnessFull (String method) {
+		String[] names = Util.allFileNames();
+		int len = names.length;
+		for(int i = 0; i < len; i++) {
+			testCorrectnessOneFile(names[i], method);
+			System.out.println((i+1) + " / " + len + " tested");
+		}
+	}
+	
+	static void testCorrectnessOneFile (String name, String method) {
+		try {
+			double[] raw = Reader.readRaw(Util.rawPathify(name));
+			double[] decompressed = Compressor.directDecompress(Compressor.compressFile(name, method),method);
+			int len = raw.length;
+			boolean correct = true;
+			for(int i = 0; i < len; i++) {
+				if(Math.abs(raw[i] - decompressed[i]) > 0.0001) {
+					System.out.println(raw[i] + " != " + decompressed[i]);
+					correct = false;
+				}
+			}
+			System.out.println(correct);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	static String toCSVLine (String[] input) {
 		int len = input.length;

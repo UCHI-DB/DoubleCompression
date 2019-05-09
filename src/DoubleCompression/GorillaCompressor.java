@@ -121,13 +121,6 @@ public class GorillaCompressor {
 		posInBuf--;
 	}
 	
-	void addBits (String s) {
-		int len = s.length();
-		for(int i = 0; i < len; i++) {
-			addBit(s.charAt(i));
-		}
-	}
-	
 	void addByte (byte b) {
 		addByte(b, 8);
 	}

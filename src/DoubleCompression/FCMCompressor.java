@@ -43,7 +43,7 @@ public class FCMCompressor {
 			if(d == prediction) {
 				perfectMatches++;
 			}
-			return Util.xor(Util.toByteArray(d), Util.toByteArray(prediction));
+			return Util.xorByteArrays(Util.toByteArray(d), Util.toByteArray(prediction));
 		}
 	}
 	
