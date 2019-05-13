@@ -5,9 +5,15 @@ import java.nio.ByteBuffer;
 public class DFCMCompressor {
 	
 	double[] input;
+	int level = 3;
 	
 	public DFCMCompressor(double[] input) {
+		this(input, 3);
+	}
+	
+	public DFCMCompressor(double[] input, int level) {
 		this.input = input;
+		this.level = level;
 	}
 	
 	double[] convert() {
@@ -24,11 +30,11 @@ public class DFCMCompressor {
 	}
 	
 	public ByteBuffer compress() {
-		return new FCMCompressor(convert()).compress();
+		return new FCMCompressor(convert(), level).compress();
 	}
 	
 	public double[] compressForGorilla() {
-		return new FCMCompressor(convert()).compressForGorilla();
+		return new FCMCompressor(convert(), level).compressForGorilla();
 	}
 	
 }

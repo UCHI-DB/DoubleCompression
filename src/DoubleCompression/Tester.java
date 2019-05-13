@@ -25,16 +25,17 @@ public class Tester {
 		Writer.writeCompressedToFile(compressed, name);
 		String ratio = compressionReport(name);
 		
+		double fileSize = Util.fileSize(Util.rawPathify(name));
 		double compressionTime = (compressionEndTime - compressionStartTime);
-		double compressionThroughput = Util.fileSize(Util.rawPathify(name)) / compressionTime;
+		double compressionThroughput = fileSize / compressionTime;
 		double decompressionTime = (decompressionEndTime - compressionEndTime);
-		double decompressionThroughput = Util.fileSize(Util.compressedPathify(name)) / decompressionTime;
+		double decompressionThroughput = fileSize / decompressionTime;
 		
 		compressionThroughput = Math.round(1000000000.0 * compressionThroughput * 100.0) / 100.0;
 		decompressionThroughput = Math.round(1000000000.0 * decompressionThroughput * 100.0) / 100.0;
 		
 		ret[0] = name;
-		ret[1] = String.valueOf(Math.round(Util.fileSize(Util.rawPathify(name)) * 1024.0 * 100.0) / 100.0);
+		ret[1] = String.valueOf(Math.round(fileSize * 1024.0 * 100.0) / 100.0);
 		ret[2] = String.valueOf(compressionThroughput);
 		ret[3] = String.valueOf(decompressionThroughput);
 		ret[4] = ratio;
@@ -45,7 +46,7 @@ public class Tester {
 	static String[][] fullTestReport (String method) throws IOException{
 			String[] names = Util.allFileNames();
 //			String[] namesFull = Util.allFileNames();
-//			int numToTest = 1000;
+//			int numToTest = 100;
 //			String[] names = new String[numToTest];
 //			for(int i = 0; i < numToTest; i++) {
 //				names[i] = namesFull[i];
@@ -59,7 +60,7 @@ public class Tester {
 			for(int i = 0; i < len; i++) {
 				//System.out.println("Decompressing " + names[i]);
 				ret[i+1] = testReport(names[i],method);
-				System.out.println((i+1) + " / " + len + " tested");
+				System.out.println(method + Compressor.FCMLevel + ": " + (i+1) + " / " + len + " tested");
 			}
 			//System.out.println("Done!");
 			return ret;
@@ -69,8 +70,9 @@ public class Tester {
 		String[] names = Util.allFileNames();
 		int len = names.length;
 		for(int i = 0; i < len; i++) {
+			//System.out.println("Decompressing " + names[i]);
 			testCorrectnessOneFile(names[i], method);
-			System.out.println((i+1) + " / " + len + " tested");
+			System.out.println(method + ": " + (i+1) + " / " + len + " tested");
 		}
 	}
 	
@@ -111,9 +113,18 @@ public class Tester {
 		}
 		writer.close();
 	}
-
+	
 	static void generateReport (String method) throws IOException {
-		makeCSV(fullTestReport(method), method + " Report.csv");
+		makeCSV(fullTestReport(method), "Analyses/Reports/" + method + " Report.csv");
+	}
+
+	static void generateReport (String method, int level) throws IOException {
+		Compressor.FCMLevel = level;
+		if(method != "Gorilla" && method != "Sprintz") {
+			makeCSV(fullTestReport(method), "Analyses/Reports/" + method + level + " Report.csv");
+		} else {
+			makeCSV(fullTestReport(method), "Analyses/Reports/" + method + " Report.csv");
+		}
 	}
 
 }

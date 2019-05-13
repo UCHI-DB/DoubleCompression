@@ -9,27 +9,41 @@ public class FCMCompressor {
 	
 	double[] input;
 	int len;
-	HashMap<ArrayList<Double>, Double> map;
+	HashMap<ArrayList<Double>, Double> arrayListMap;
+	HashMap<Double, Double> doubleMap;
 	int count = 0;
 	double matches = 0;
 	double perfectMatches = 0;
+	int level = 3;
 	
 	public FCMCompressor(double[] input) {
+		this(input, 3);
+	}
+	
+	public FCMCompressor(double[] input, int level) {
 		this.input = input;
 		this.len = input.length;
-		this.map = new HashMap<ArrayList<Double>, Double>();
+		if(level == 1) {
+			this.doubleMap = new HashMap<Double, Double>();
+		} else {
+			this.arrayListMap = new HashMap<ArrayList<Double>, Double>();
+		}
 		this.count = 0;
+		this.level = level;
 	}
 	
 	public ByteBuffer compress() {
 		ByteBuffer ret = ByteBuffer.allocate(8 * input.length);
 		for(double d : input) {
+//			if(d == 0.527090441) {
+//				System.out.println("Hit");
+//			}
 			ret.put(compressOne(d));
 			update();
 			count++;
 		}
-		System.out.println(Math.round(10000.0 * matches / count) / 100.0 + "," +
-				Math.round(10000.0 * perfectMatches / count) / 100.0);
+//		System.out.println(Math.round(10000.0 * matches / count) / 100.0 + "," +
+//				Math.round(10000.0 * perfectMatches / count) / 100.0);
 
 		return ret;
 	}
@@ -39,10 +53,10 @@ public class FCMCompressor {
 		if(prediction == null) {
 			return Util.toByteArray(d);
 		} else {
-			matches++;
-			if(d == prediction) {
-				perfectMatches++;
-			}
+//			matches++;
+//			if(d == prediction) {
+//				perfectMatches++;
+//			}
 			return Util.xorByteArrays(Util.toByteArray(d), Util.toByteArray(prediction));
 		}
 	}
@@ -67,20 +81,39 @@ public class FCMCompressor {
 		}
 	}
 	
-	ArrayList<Double> getPrev() {
-		if(count >= 3) {
-			ArrayList<Double> ret = new ArrayList<Double>(Arrays.asList(Double.valueOf(input[count-3]), Double.valueOf(input[count-2]), Double.valueOf(input[count-1])));
+	ArrayList<Double> getPrevList() {
+		if(count >= level) {
+			ArrayList<Double> ret = new ArrayList<Double>();
+			for(int i = 1; i <= level; i++) {
+				ret.add(Double.valueOf(input[count-i]));
+			}
 			return ret;
 		} else {
 			return null;
 		}
 	}
 	
-	Double predict() {
-		if(count >= 3) {
-			return map.get(getPrev());
+	Double getPrevDouble() {
+		if(count >= level) {
+			return Double.valueOf(input[count-1]);
 		} else {
 			return null;
+		}
+	}
+	
+	Double predict() {
+		if(level == 1) {
+			if(count >= level) {
+				return doubleMap.get(getPrevDouble());
+			} else {
+				return null;
+			}
+		} else {
+			if(count >= level) {
+				return arrayListMap.get(getPrevList());
+			} else {
+				return null;
+			}
 		}
 	}
 	
@@ -93,10 +126,18 @@ public class FCMCompressor {
 	}
 	
 	void update() {
-		ArrayList<Double> prev = getPrev();
-		Double actual = actual();
-		if(prev != null && actual != null) {
-			map.put(getPrev(), actual());
+		if(level == 1) {
+			Double prev = getPrevDouble();
+			Double actual = actual();
+			if(prev != null && actual != null) {
+				doubleMap.put(prev, actual);
+			}
+		} else {
+			ArrayList<Double> prev = getPrevList();
+			Double actual = actual();
+			if(prev != null && actual != null) {
+				arrayListMap.put(prev, actual);
+			}
 		}
 	}
 	

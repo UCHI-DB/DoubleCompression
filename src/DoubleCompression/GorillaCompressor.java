@@ -14,10 +14,12 @@ public class GorillaCompressor {
 	double[] input;
 	byte buf = 0;
 	byte posInBuf = 7;
+	boolean frontCoding;
 	ByteArrayOutputStream ret = new ByteArrayOutputStream();
 	
-	public GorillaCompressor (double[] input) {
+	public GorillaCompressor (double[] input, boolean frontCoding) {
 		this.input = input;
+		this.frontCoding = frontCoding;
 	}
 	
 	public ByteBuffer compress() throws IOException {
@@ -46,13 +48,22 @@ public class GorillaCompressor {
 				addBit('1');
 				byte leading = (byte) leadingZeroes(arr);
 				byte trailing = (byte) trailingZeroes(arr);
-				if(leading >= prevLeading && trailing >= prevTrailing) {
-					addBit('0');
-					byte[] meaningful = meaningful(arr, prevLeading, prevTrailing);
-					addBytes(meaningful);
-					prev = d;
+				if(frontCoding) {
+					if(leading >= prevLeading && trailing >= prevTrailing) {
+						addBit('0');
+						byte[] meaningful = meaningful(arr, prevLeading, prevTrailing);
+						addBytes(meaningful);
+						prev = d;
+					} else {
+						addBit('1');
+						addByte(leading, 5);
+						byte[] meaningful = meaningful(arr, leading, trailing);
+						byte meaningfulLen = (byte) meaningful.length;
+						addByte(meaningfulLen, 6);
+						addBytes(meaningful);
+						setPrev(d, leading, trailing);
+					}
 				} else {
-					addBit('1');
 					addByte(leading, 5);
 					byte[] meaningful = meaningful(arr, leading, trailing);
 					byte meaningfulLen = (byte) meaningful.length;

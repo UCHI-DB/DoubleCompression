@@ -16,14 +16,16 @@ public class GorillaDecompressor {
 	int prevLeading = 9;
 	int prevTrailing;
 	int numMeaningful;
+	boolean frontCoding = true;
 	
-	public GorillaDecompressor(ByteBuffer input) {
+	public GorillaDecompressor(ByteBuffer input, boolean frontCoding) {
 		inputByteLen = input.capacity();
 		inputBitLen = inputByteLen * 8;
 		inputArray = new byte[inputByteLen];
 		input.get(inputArray);
 		int numExtra = inputArray[inputByteLen-1];
 		inputBitLen -= numExtra + 8;
+		this.frontCoding = frontCoding;
 	}
 	
 	public double[] decompress() {
@@ -53,8 +55,15 @@ public class GorillaDecompressor {
 			if(nextBit() == 0) {
 				return prev;
 			} else {
-				if(nextBit() == 0){
-					return generateDouble();
+				if(frontCoding) {
+					if(nextBit() == 0){
+						return generateDouble();
+					} else {
+						prevLeading = nextN(5).get();
+						numMeaningful = nextN(6).get();
+						prevTrailing = 8 - prevLeading - numMeaningful;
+						return generateDouble();
+					}
 				} else {
 					prevLeading = nextN(5).get();
 					numMeaningful = nextN(6).get();
