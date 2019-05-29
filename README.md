@@ -179,4 +179,4 @@ Contains utility functions used for a variety of purposes throughout the rest of
 
 ###### Writer.java
 
-Cotains code for writing data to a file.
+Contains code for writing data to a file.
