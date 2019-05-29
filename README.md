@@ -79,7 +79,7 @@ Contains the raw data files, which are ASCII representations of the doubles. Eac
 
 Contains the reference implementation of Gorilla from https://github.com/burmanm/gorilla-tsc. I modified it very slightly, mainly just making some functions public so that they could be accessed in my files.
 
-## gzipbin1-9
+## gzipbin
 
 Raw data for making reports of how gzip performs on binary data. The already made gzip reports are the results of running gzip on the raw ASCII data, but we figured we should see if it performed any better on the binary data. Each first line contains the percent the first file was compressed by (*NOTE:* If it was compressed by 60%, the compression ratio is 0.4, not 0.6), the second line is the compression time, and the third line is the decompression time, and then it repeats for the next files. This is a project that should be taken on in future research.
 
