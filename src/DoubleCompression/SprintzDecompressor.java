@@ -12,28 +12,37 @@ public class SprintzDecompressor {
 	int inputBitLen;
 	int pos = 0;
 	double prev = 0;
-	byte[] block = new byte[64];
+	byte blockSize;
+	byte[] block;
 	ArrayList<Double> doubleList = new ArrayList<Double>();
 	int numBlocksDecompressed = 0;
 	
 	public SprintzDecompressor (ByteBuffer input) {
+		this(input, 8);
+	}
+	
+	public SprintzDecompressor (ByteBuffer input, int blockSize) {
 		this.input = input;
+		this.blockSize = (byte) blockSize;
 		this.inputByteLen = input.capacity();
 		this.inputBitLen = inputByteLen * 8;
 		this.inputArray = new byte[inputByteLen];
 		input.get(inputArray);
 		int numExtra = inputArray[inputByteLen-1];
 		inputBitLen -= numExtra + 8;
+		block = new byte[8];
 	}
 	
+//	Decompresses the given ByteBuffer that has been compressed using 
+//	SprintzCompressor.
 	public double[] decompress() {
 		
 		int targetLen = nextN(32).getInt();
-		while(pos < inputBitLen) {
+		while(pos < inputBitLen && doubleList.size() < targetLen) {
 			byte nBits = nextN(7).get();
 			if(nBits == 0) {
-				int numZeroBlocks = nextN(7).get();
-				for(int i = 0; i < numZeroBlocks * 8; i++) {
+				short numZeroBlocks = nextN(16).getShort();
+				for(int i = 0; i < numZeroBlocks * blockSize; i++) {
 					doubleList.add(prev);
 				}
 			} else {
@@ -51,9 +60,10 @@ public class SprintzDecompressor {
 		
 	}
 	
+	//Decompresses a block of doubles.
 	void decompressBlock (int nBits) {
 		
-		int numToGet = Math.min(8, (inputBitLen - pos) / nBits);
+		int numToGet = Math.min(blockSize, (inputBitLen - pos) / nBits);
 		for(int i = 0; i < numToGet; i++) {
 			byte[] arr = new byte[8];
 			arr[0] |= nextN(1).get() << 7;
@@ -64,25 +74,31 @@ public class SprintzDecompressor {
 				arr[8 - numBytes + j] = nextN(8).get();
 			}
 			double ret = Util.toDouble(arr);
-			ret += prev;
+			//ret += prev;
+			ret = Util.xorDoubles(ret, prev);
 			prev = ret;
 			doubleList.add(ret);
 		}
 		
 	}
 	
+//	Gets the current byte index of the input array.
 	int currIndex() {
 		return (int) Math.floor(pos/8);
 	}
 	
+//	Gets the current bit offset in the current byte of the input array.
 	int currOffset() {
 		return pos - (currIndex() * 8);
 	}
 	
+//	Gets the the shift amount of the current bit of the current byte in the 
+//	input array.
 	int currShiftAmount() {
 		return 7 - currOffset();
 	}
 	
+//	Gets the next bit of the input array and increments the position in the array.
 	int nextBit() {
 		byte b = inputArray[currIndex()];
 		int shift = currShiftAmount();
@@ -90,7 +106,13 @@ public class SprintzDecompressor {
 		return (b & 1 << shift) >> shift;
 	}
 	
+//	Gets the next n bits of the input array and increments the position in the 
+//	array by n.
 	ByteBuffer nextN (int n) {
+		if(n == 0) {
+			ByteBuffer ret = ByteBuffer.allocate(8);
+			return ret;
+		}
 		ByteBuffer ret = ByteBuffer.allocate((int) Math.ceil(n/8.0));
 		byte buf = 0;
 		int posInBuf = 7;

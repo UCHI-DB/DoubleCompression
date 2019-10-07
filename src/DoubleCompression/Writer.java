@@ -10,13 +10,14 @@ import java.nio.file.Paths;
 
 public class Writer {
 
+//	Writes the given compressed ByteBuffer to the file located at output.
 	static void writeCompressedToFile(ByteBuffer toWrite, String output) 
 			throws IOException {
 		
 		output = Util.compressedPathify(output);
 	    OutputStream outstream = Files.newOutputStream(Paths.get(output));
 	    toWrite.flip();
-		int len = toWrite.capacity();
+		int len = toWrite.limit();
 		byte[] outputArray = new byte[len];
 		toWrite.get(outputArray);
 		
@@ -27,6 +28,7 @@ public class Writer {
 		
 	}
 
+//	Writes the given uncompressed double[] to the file located at output.
 	static void writeUncompressedToFile(double[] toWrite, String output) throws FileNotFoundException {
 	
 		PrintWriter out = new PrintWriter(output);

@@ -43,6 +43,7 @@ public class FCMDecompressor {
 		this.level = level;
 	}
 	
+//	Decompress the given ByteBuffer that has been compressed using FCMCompressor.
 	public double[] decompress() {
 		while(byteInput.position() < byteInput.capacity()) {
 			output[count] = decompressOne();
@@ -52,12 +53,16 @@ public class FCMDecompressor {
 		return output;
 	}
 	
+//	Decompress one double.
 	double decompressOne() {
 		actual = byteInput.getDouble();
 		Double prediction = predict();
 		return Util.xorDoubles(actual, prediction);
 	}
 	
+//	Decompress the given double[] that has already been run through another
+//	decompressor (Gorilla or Sprintz). The function name is a misnomer, and
+//	should be changed.
 	public double[] decompressFromGorilla() {
 		for(int i = 0; i < len; i++) {
 			actual = doubleInput[i];
@@ -68,12 +73,13 @@ public class FCMDecompressor {
 		return output;
 	}
 	
+//	Decompress one double.
 	double decompressOneFromGorilla (double input) {
 		Double prediction = predict();
 		return Util.xorDoubles(input, prediction);
-
 	}
 	
+//	Gets the n (where n = level) previous doubles decompressed.
 	ArrayList<Double> getPrevList() {
 		if(count >= level) {
 			ArrayList<Double> ret = new ArrayList<Double>();
@@ -86,6 +92,7 @@ public class FCMDecompressor {
 		}
 	}
 	
+//	Gets the previous double decompressed.
 	Double getPrevDouble() {
 		if(count >= level) {
 			return Double.valueOf(output[count-1]);
@@ -94,6 +101,7 @@ public class FCMDecompressor {
 		}
 	}
 	
+//	Predicts the next double.
 	Double predict() {
 		if(level == 1) {
 			if(count >= level) {
@@ -113,6 +121,7 @@ public class FCMDecompressor {
 		return (double) 0;
 	}
 	
+//	Updates the prediction table.
 	void update() {
 		if(level == 1) {
 			Double prev = getPrevDouble();

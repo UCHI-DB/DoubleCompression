@@ -16,6 +16,7 @@ public class DFCMCompressor {
 		this.level = level;
 	}
 	
+//	Converts the raw double values to differences.
 	double[] convert() {
 		int len = input.length;
 		double[] output = new double[len];
@@ -29,12 +30,16 @@ public class DFCMCompressor {
 		return output;
 	}
 	
+//	Compresses the given double[] using DFCM.
 	public ByteBuffer compress() {
 		return new FCMCompressor(convert(), level).compress();
 	}
 	
+//	Compresses the given double[] to a new double[] that can then be further
+//	compressed by Gorilla or Sprintz. The name is a misnomer and should be changed.
 	public double[] compressForGorilla() {
-		return new FCMCompressor(convert(), level).compressForGorilla();
+		double[] test = new FCMCompressor(convert(), level).compressForGorilla();
+		return test;
 	}
 	
 }

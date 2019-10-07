@@ -28,13 +28,11 @@ public class GorillaDecompressor {
 		this.frontCoding = frontCoding;
 	}
 	
+//	Decompress the given ByteBuffer that has been compressed using 
+//	GorillaCompressor.
 	public double[] decompress() {
 		while(pos < inputBitLen) {
 			double decompressed = decompressOne();
-//			System.out.println("Decompressed " + decompressed);
-//			if(decompressed == -1.4457912) {
-//				System.out.println("Hit");
-//			}
 			doubleList.add(decompressed);
 		}
 		int len = doubleList.size();
@@ -45,6 +43,7 @@ public class GorillaDecompressor {
 		return ret;
 	}
 	
+//	Decompress one double.
 	double decompressOne() {
 		if(first) {
 			double ret = nextN(64).getDouble();
@@ -73,18 +72,23 @@ public class GorillaDecompressor {
 			}
 	}
 	
+//	Gets the current byte index of the input array.
 	int currIndex() {
 		return (int) Math.floor(pos/8);
 	}
 	
+//	Gets the current bit offset in the current byte of the input array.
 	int currOffset() {
 		return pos - (currIndex() * 8);
 	}
 	
+//	Gets the the shift amount of the current bit of the current byte in the 
+//	input array.
 	int currShiftAmount() {
 		return 7 - currOffset();
 	}
 	
+//	Gets the next bit of the input array and increments the position in the array.
 	int nextBit() {
 		byte b = inputArray[currIndex()];
 		int shift = currShiftAmount();
@@ -92,6 +96,8 @@ public class GorillaDecompressor {
 		return (b & 1 << shift) >> shift;
 	}
 	
+//	Gets the next n bits of the input array and increments the position in the 
+//	array by n.
 	ByteBuffer nextN (int n) {
 		ByteBuffer ret = ByteBuffer.allocate((int) Math.ceil(n/8.0));
 		byte buf = 0;
@@ -112,6 +118,7 @@ public class GorillaDecompressor {
 		return ret;
 	}
 	
+//	Calculates the next double to return.
 	double generateDouble () {
 		ByteBuffer meaningful = nextN(numMeaningful * 8);
 		double xor = constructXor(prevTrailing, prevLeading, meaningful);
@@ -120,12 +127,15 @@ public class GorillaDecompressor {
 		return ret;
 	}
 	
+//	Gets the next xor value from the ByteBuffer.
 	double constructXor(int trailing, int leading, ByteBuffer meaningful) {
 		byte[] array = new byte[8];
 		meaningful.get(array, trailing, numMeaningful);
 		return Util.toDouble(array);
 	}
 	
+//	Gets the number of trailing (to the left of the meaningul) zeroes in 
+//	the given string.
 	int trailingZeroes (String s) {
 		int ret = 0;
 		int len = s.length();
@@ -139,6 +149,8 @@ public class GorillaDecompressor {
 		return ret;
 	}
 	
+//	Gets the number of leading (to the right of the meaningul) zeroes in 
+//	the given string.
 	int leadingZeroes (String s) {
 		return trailingZeroes(new StringBuilder(s).reverse().toString());
 	}

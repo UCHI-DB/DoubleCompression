@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 public class Reader {
 	
+	//Reads the given raw file and returns its contents as a double[].
 	public static double[] readRaw (String f) throws IOException
     {
 		
@@ -24,6 +25,7 @@ public class Reader {
         
     }
 	
+	//Reads the given compressed file and returns its contents as a ByteBuffer.
 	public static ByteBuffer readCompressed (String f) throws IOException
     {
 		

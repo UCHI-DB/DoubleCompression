@@ -13,6 +13,7 @@ public class ToBinaryDecompressor {
 		this.output = new double[input.capacity()/8];
 	}
 	
+	// Decompresses the given ByteBuffer that has been compressed using the ToBinaryCompressor
 	public double[] decompress() {
 		while(input.position() < input.capacity()) {
 			output[count] = input.getDouble();
