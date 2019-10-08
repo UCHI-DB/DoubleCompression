@@ -7,14 +7,22 @@ public class Main {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		
-//		try {
-//			Tester.generateReport("FCMSprintz");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			Tester.generateReport("DFCM", false);
+			Tester.generateReport("DFCMGorilla", false);
+			Tester.generateReport("FCM", false);
+			Tester.generateReport("FCMGorilla", false);
+			Tester.generateReport("Gorilla", false);
+			Tester.generateReport("GorillaRef", false);
+			Tester.generateReport("Sprintz", false);
+			Tester.generateReport("ToBinary", false);
+			Tester.generateReport("ToInt", false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 //		Compressor.sprintzBlockSize = 8;
-		Tester.testCorrectnessFull("Sprintz");
+//		Tester.testCorrectnessFull("ToInt");
 
 //		String name = "Worms_66";
 //		try {

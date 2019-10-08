@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class ToIntCompressor {
 
@@ -20,6 +22,17 @@ public class ToIntCompressor {
 //	Compresses the given double[] lossily by converting it into the 
 //	nearest integer of maximum precision.
 	public ByteBuffer compress() throws IOException {
+		double min = Double.POSITIVE_INFINITY; 
+		for(double d : input) {
+			if(d < min) {
+				min = d;
+			}
+		}
+		int len = input.length;
+		for(int i = 0; i < len; i++) {
+			input[i] -= min;
+		}
+		addBytes(Util.toByteArray(min));
 		for(double d : input) {
 			compressOne(d);
 		}

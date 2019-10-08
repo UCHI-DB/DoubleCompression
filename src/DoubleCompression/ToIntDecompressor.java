@@ -23,6 +23,7 @@ public class ToIntDecompressor {
 //	Decompresses the given ByteBuffer that has been compressed using 
 //	ToIntCompressor.
 	public double[] decompress() {
+		double min = (double) nextN(64).getDouble();
 		while(pos < inputBitLen) {
 			double decompressed = decompressOne();
 			doubleList.add(decompressed);
@@ -30,7 +31,7 @@ public class ToIntDecompressor {
 		int len = doubleList.size();
 		double[] ret = new double[len];
 		for(int i = 0; i < len; i++) {
-			ret[i] = doubleList.get(i);
+			ret[i] = doubleList.get(i) + min;
 		}
 		return ret;
 	}

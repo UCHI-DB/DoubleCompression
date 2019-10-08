@@ -1,6 +1,8 @@
 package DoubleCompression;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -21,7 +23,7 @@ public class Tester {
 	 * method) of the given file using the given compression method
 	 */
 	static String[] testReport (String name, String method) throws IOException {
-		String[] ret = new String[6];
+		String[] ret = new String[5];
 		double[] data = Reader.readRaw(Util.rawPathify(name));
 		long compressionStartTime = System.nanoTime();
 		ByteBuffer compressed = Compressor.directCompress(data, method);
@@ -41,18 +43,18 @@ public class Tester {
 		decompressionThroughput = Math.round(1000000000.0 * decompressionThroughput * 100.0) / 100.0;
 		
 		ret[0] = name;
-		ret[1] = String.valueOf(Math.round(fileSize * 1024.0 * 100.0) / 100.0);
-		ret[2] = String.valueOf(compressionThroughput);
-		ret[3] = String.valueOf(decompressionThroughput);
-		ret[4] = ratio;
-		ret[5] = method;
+//		ret[1] = String.valueOf(Math.round(fileSize * 1024.0 * 100.0) / 100.0);
+		ret[1] = String.valueOf(compressionThroughput);
+		ret[2] = String.valueOf(decompressionThroughput);
+		ret[3] = ratio;
+		ret[4] = method;
 		return ret;
 	}
 
 	/*Calculates and returns the test report for all files using the given 
 	 * compression method.
 	 */
-	static String[][] fullTestReport (String method) throws IOException{
+	static String[][] fullTestReport (String method, boolean verbose) throws IOException{
 		
 			String[] names = Util.allFileNames();
 			
@@ -60,28 +62,68 @@ public class Tester {
 //			test only the first numToTest files:
 			
 //			String[] namesFull = Util.allFileNames();
-//			int numToTest = 100;
+//			int numToTest = 1000;
 //			String[] names = new String[numToTest];
 //			for(int i = 0; i < numToTest; i++) {
 //				names[i] = namesFull[i];
 //			}
 			
 			int len = names.length;
-			String[][] ret = new String[len+1][6];
+			double compressionThroughputTotal = 0;
+			double decompressionThroughputTotal = 0;
+			double CRTotal = 0;
+			String[][] ret = new String[verbose ? len+2 : 2][6];
 			System.out.println("Beginning testing!");
-			ret[0] = new String[] {"File Name", "File Size (kb)", 
-					"Compression Throughput (mb/s)", "Decompression Throughput (mb/s)",
-					"Compression Ratio", "Method"};
+			ret[0] = new String[] {verbose ? "File Name" : "",  
+					"Compression Throughput (mb/s)", 
+					"Decompression Throughput (mb/s)",
+					"Compression Ratio", 
+					"Method"};
 			for(int i = 0; i < len; i++) {
-				//System.out.println("Decompressing " + names[i]);
-				ret[i+1] = testReport(names[i],method);
+				String[] line = testReport(names[i],method);
+				if(verbose) {
+					ret[i+1] = line;
+				}
+				compressionThroughputTotal += Double.parseDouble(line[1]);
+				decompressionThroughputTotal += Double.parseDouble(line[2]);
+				CRTotal += Double.parseDouble(line[3]);
 				System.out.println(method + Compressor.sprintzBlockSize + ": " + (i+1) + " / " + len + " tested");
 			}
+			int averageCompressionThroughput = (int) Math.round(compressionThroughputTotal / len);
+			int averageDecompressionThroughput = (int) Math.round(decompressionThroughputTotal / len);
+			double averageCR = Math.round((CRTotal / len) * 100.0) / 100.0;
+			String[] averages = new String[] {"Average", 
+					String.valueOf(averageCompressionThroughput),
+					String.valueOf(averageDecompressionThroughput), 
+					String.valueOf(averageCR),
+					method};
+			ret[verbose ? len+1 : 1] = averages;
+			addToFullReport(averages);
 			System.out.println("Done!");
 			return ret;
 			
 		}
 	
+	static void addToFullReport(String[] averages) throws IOException {
+		String[] formattedAverage = new String[] {averages[4], 
+				averages[1], 
+				averages[2], 
+				averages[3]};
+		BufferedReader reader = new BufferedReader(new FileReader(new File("Analyses/Reports/Full Report.csv")));
+		String row;
+		String[][] currentReport = new String[11][4];
+		int i = 0;
+		while ((row = reader.readLine()) != null) {
+		    currentReport[i] = row.split(",");
+		    if(currentReport[i][0].equals(formattedAverage[0])) {
+		    	currentReport[i] = formattedAverage;
+		    }
+		    i++;
+		}
+		reader.close();
+		makeCSV(currentReport, "Analyses/Reports/Full Report.csv");
+	}
+
 //	Tests the correctness of the compression and decompression of all files 
 //	using the given compression method.
 	public static void testCorrectnessFull (String method) {
@@ -138,21 +180,26 @@ public class Tester {
 	}
 	
 //	Generates a full test report for the given compression method.
-	static void generateReport (String method) throws IOException {
-		makeCSV(fullTestReport(method), "Analyses/Reports/" + method + " Report.csv");
+	static void generateReport (String method, boolean verbose) throws IOException {
+		if(verbose) {
+			makeCSV(fullTestReport(method, verbose), "Analyses/Reports/" + method + " Report.csv");
+		}
+		else {
+			fullTestReport(method, verbose);
+		}
 	}
 
 //	Generates a full test report for the given compression method, with the
 //	(D)FCM level and Sprintz blocksize specified.
-	static void generateReport (String method, int level, int blockSize) throws IOException {
+	static void generateReport (String method, boolean verbose, int level, int blockSize) throws IOException {
 		Compressor.FCMLevel = level;
 		Compressor.sprintzBlockSize = blockSize;
 		if(method == "FCM" || method == "DFCM") {
-			makeCSV(fullTestReport(method), "Analyses/Reports/" + method + level + " Report.csv");
+			makeCSV(fullTestReport(method, verbose), "Analyses/Reports/" + method + level + " Report.csv");
 		} else if (method == "Sprintz") {
-			makeCSV(fullTestReport(method), "Analyses/Reports/" + method + blockSize + " Report.csv");
+			makeCSV(fullTestReport(method, verbose), "Analyses/Reports/" + method + blockSize + " Report.csv");
 		} else {
-			makeCSV(fullTestReport(method), "Analyses/Reports/" + method + " Report.csv");
+			makeCSV(fullTestReport(method, verbose), "Analyses/Reports/" + method + " Report.csv");
 		}
 	}
 

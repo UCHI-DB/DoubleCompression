@@ -15,9 +15,9 @@ public class FCMCompressor {
 	double matches = 0;
 	double perfectMatches = 0;
 	int level = 1;
-	double[] bitReportArray = new double[64];
-	boolean bitReport = true;
-	int numInBitReport = 0;
+//	double[] bitReportArray = new double[64];
+//	boolean bitReport = true;
+//	int numInBitReport = 0;
 	
 	public FCMCompressor(double[] input) {
 		this(input, 3);
@@ -47,10 +47,10 @@ public class FCMCompressor {
 		}
 //		System.out.println(Math.round(10000.0 * matches / count) / 100.0 + "," +
 //				Math.round(10000.0 * perfectMatches / count) / 100.0);
-		if(numInBitReport > 0) {
-			bitReportArray = Util.normalizedBitReport(numInBitReport, bitReportArray);
-			Util.printBitReport(bitReportArray);
-		}
+//		if(numInBitReport > 0) {
+//			bitReportArray = Util.normalizedBitReport(numInBitReport, bitReportArray);
+//			Util.printBitReport(bitReportArray);
+//		}
 		return ret;
 	}
 	
@@ -66,8 +66,8 @@ public class FCMCompressor {
 //			}
 			ret = Util.xorByteArrays(Util.toByteArray(d), Util.toByteArray(prediction));
 		}
-		Util.addToBitReport(Util.toDouble(ret), bitReportArray);
-		numInBitReport++;
+//		Util.addToBitReport(Util.toDouble(ret), bitReportArray);
+//		numInBitReport++;
 		return ret;
 	}
 	
