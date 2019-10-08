@@ -24,7 +24,6 @@ In my testing, the best method I have found is a slightly modified Sprintz (usin
 
 There are many further avenues to take this research, ranging from fast tweaks to major optimizations. These next steps include:
 
-- Move functions related to buffering (addBit, addByte, addBytes in the Compressor files, currIndex, currOffset, currShiftAmount, nextBit, nextN in the Decompressor files) to Util so that they aren't unnecessarily repeated in code.
 - General optimizations, which may result in up to 5x faster throughputs. I believe that the reference implementation of Gorilla in gorilla-tsc holds many keys to doing this, particularly in switching over from using ByteBuffers to using their ByteBufferBitInput and ByteBufferBitOutput. These will allow us to avoid converting doubles to byte[]s, which I believe is a major source of slowdowns currently and should be entirely eliminated. Relatedly, using more bitwise operations directly on the doubles will help complete this task and cause other speedups.
 - Implement SprintzFIRE, which is outlined in the Sprintz paper as an alternative, more complex learning-based predictor that may lead to lower CRs for Sprintz than the current system of using xoring with the previous value (which itself if better than SprintzDelta).
 - Investigate compression of ints and run the outputs of ToInt through those for decreased CRs for lossy compression - this may involve modifying Gorilla, Sprintz, and (D)FCM to work for ints.
