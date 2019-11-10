@@ -22,9 +22,9 @@ public class Tester {
 	 * compression throughput, decompression throughput, CR, and compression 
 	 * method) of the given file using the given compression method
 	 */
-	static String[] testReport (String name, String method) throws IOException {
+	static String[] testReport (String name, String method, String dataset) throws IOException {
 		String[] ret = new String[5];
-		double[] data = Reader.readRaw(Util.rawPathify(name));
+		double[] data = Reader.readRaw(Util.rawPathify(name, dataset));
 		long compressionStartTime = System.nanoTime();
 		ByteBuffer compressed = Compressor.directCompress(data, method);
 		long compressionEndTime = System.nanoTime();
@@ -33,7 +33,7 @@ public class Tester {
 		Writer.writeCompressedToFile(compressed, name);
 		String ratio = compressionReport(name);
 		
-		double fileSize = Util.fileSize(Util.rawPathify(name));
+		double fileSize = Util.fileSize(Util.rawPathify(name,dataset));
 		double compressionTime = (compressionEndTime - compressionStartTime);
 		double compressionThroughput = fileSize / compressionTime;
 		double decompressionTime = (decompressionEndTime - compressionEndTime);
@@ -50,13 +50,17 @@ public class Tester {
 		ret[4] = method;
 		return ret;
 	}
+	
+	static String[][] fullTestReport (String method, boolean verbose) throws IOException{
+		return fullTestReport(method, verbose, "raw");
+	}
 
 	/*Calculates and returns the test report for all files using the given 
 	 * compression method.
 	 */
-	static String[][] fullTestReport (String method, boolean verbose) throws IOException{
+	static String[][] fullTestReport (String method, boolean verbose, String dataset) throws IOException{
 		
-			String[] names = Util.allFileNames();
+			String[] names = Util.allFileNames(dataset);
 			
 //			This block of code can be swapped with the first line to 
 //			test only the first numToTest files:
@@ -80,13 +84,14 @@ public class Tester {
 					"Compression Ratio", 
 					"Method"};
 			for(int i = 0; i < len; i++) {
-				String[] line = testReport(names[i],method);
+				String[] line = testReport(names[i],method,dataset);
 				if(verbose) {
 					ret[i+1] = line;
 				}
 				compressionThroughputTotal += Double.parseDouble(line[1]);
 				decompressionThroughputTotal += Double.parseDouble(line[2]);
 				CRTotal += Double.parseDouble(line[3]);
+//				System.out.println(names[i]);
 				System.out.println(method + Compressor.sprintzBlockSize + ": " + (i+1) + " / " + len + " tested");
 			}
 			int averageCompressionThroughput = (int) Math.round(compressionThroughputTotal / len);
@@ -98,20 +103,20 @@ public class Tester {
 					String.valueOf(averageCR),
 					method};
 			ret[verbose ? len+1 : 1] = averages;
-			addToFullReport(averages);
+			addToFullReport(averages, dataset);
 			System.out.println("Done!");
 			return ret;
 			
 		}
 	
-	static void addToFullReport(String[] averages) throws IOException {
+	static void addToFullReport(String[] averages, String dataset) throws IOException {
 		String[] formattedAverage = new String[] {averages[4], 
 				averages[1], 
 				averages[2], 
 				averages[3]};
-		BufferedReader reader = new BufferedReader(new FileReader(new File("Analyses/Reports/Full Report.csv")));
+		BufferedReader reader = new BufferedReader(new FileReader(new File("Analyses/Reports/" + dataset + "/Full Report.csv")));
 		String row;
-		String[][] currentReport = new String[11][4];
+		String[][] currentReport = new String[12][4];
 		int i = 0;
 		while ((row = reader.readLine()) != null) {
 		    currentReport[i] = row.split(",");
@@ -132,7 +137,7 @@ public class Tester {
 		for(int i = 0; i < len; i++) {
 			//System.out.println("Decompressing " + names[i]);
 			testCorrectnessOneFile(names[i], method);
-			//System.out.println(method + ": " + (i+1) + " / " + len + " tested");
+			System.out.println(method + ": " + (i+1) + " / " + len + " tested");
 		}
 	}
 	
@@ -140,7 +145,7 @@ public class Tester {
 //	file using the given compression method. In the case that the expected 
 //	result is not attained for a given double, the expected and actual double 
 //	will be output.
-	static void testCorrectnessOneFile (String name, String method) {
+	public static void testCorrectnessOneFile (String name, String method) {
 		try {
 			double[] raw = Reader.readRaw(Util.rawPathify(name));
 			double[] decompressed = Compressor.directDecompress(Compressor.compressFile(name, method),method);
@@ -180,12 +185,12 @@ public class Tester {
 	}
 	
 //	Generates a full test report for the given compression method.
-	static void generateReport (String method, boolean verbose) throws IOException {
+	static void generateReport (String method, boolean verbose, String dataset) throws IOException {
 		if(verbose) {
 			makeCSV(fullTestReport(method, verbose), "Analyses/Reports/" + method + " Report.csv");
 		}
 		else {
-			fullTestReport(method, verbose);
+			fullTestReport(method, verbose, dataset);
 		}
 	}
 

@@ -1,28 +1,24 @@
 package DoubleCompression;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Main {
 
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException, IOException {
 		
-		try {
-			Tester.generateReport("DFCM", false);
-			Tester.generateReport("DFCMGorilla", false);
-			Tester.generateReport("FCM", false);
-			Tester.generateReport("FCMGorilla", false);
-			Tester.generateReport("Gorilla", false);
-			Tester.generateReport("GorillaRef", false);
-			Tester.generateReport("Sprintz", false);
-			Tester.generateReport("ToBinary", false);
-			Tester.generateReport("ToInt", false);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Tester.generateReport("SprintzRef", false, "raw");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
 //		Compressor.sprintzBlockSize = 8;
-//		Tester.testCorrectnessFull("ToInt");
+		Tester.testCorrectnessFull("SprintzRef");
 
 //		String name = "Worms_66";
 //		try {

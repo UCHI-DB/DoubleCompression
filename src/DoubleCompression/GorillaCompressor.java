@@ -16,6 +16,7 @@ public class GorillaCompressor {
 	byte posInBuf = 7;
 	boolean frontCoding;
 	ByteArrayOutputStream ret = new ByteArrayOutputStream();
+	long totalConvertTime = 0;
 	
 	public GorillaCompressor (double[] input, boolean frontCoding) {
 		this.input = input;
@@ -24,17 +25,24 @@ public class GorillaCompressor {
 	
 //	Compresses the given double[] using Gorilla.
 	public ByteBuffer compress() throws IOException {
+		long startTime = System.nanoTime(); 
 		for(double d : input) {
 			compressOne(d);
 		}
 		flush();
+		long endTime = System.nanoTime();
+		long time = endTime - startTime;
+		System.out.println(100 * (double) totalConvertTime / time);
 		return ByteBuffer.wrap(ret.toByteArray());
 	}
 	
 //	Compresses one double.
 	void compressOne(double d) throws IOException {
 		double xored = Util.xorDoubles(d, prev);
+		long convertStartTime = System.nanoTime();
 		byte[] arr = Util.toByteArray(xored);
+		long convertEndTime = System.nanoTime();
+		totalConvertTime += convertEndTime - convertStartTime;
 		if(first == true) {
 			addBytes(Util.toByteArray(d));
 			first = false;

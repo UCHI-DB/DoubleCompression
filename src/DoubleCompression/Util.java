@@ -128,23 +128,31 @@ public class Util {
 	static String compressedPathify (String f) {
 		return System.getProperty("user.dir") + "/output/" + Util.getFolderName(f) + "/" + f + "_COMPRESSED";
 	}
+	
+	static String rawPathify (String f) {
+		return rawPathify(f, "raw");
+	}
 
 //	Returns the path of the raw version of the given file.
-	static String rawPathify (String f) {
-		return System.getProperty("user.dir") + "/data/" + Util.getFolderName(f) + "/" + f;
+	static String rawPathify (String f, String dataset) {
+		return System.getProperty("user.dir") + "/data/" + dataset + "/" + Util.getFolderName(f) + "/" + f;
 	}
 
 //	Returns the name of the folder that the given raw or compressed file is in.
 	static String getFolderName (String f) {
 		return f.split("_")[0];
 	}
+	
+	static String[] allFileNames() {
+		return allFileNames("raw");
+	}
 
 //	Returns a String[] of all of the raw file names.
-	static String[] allFileNames () {
+	static String[] allFileNames (String dataset) {
 		String[] folderNames = Util.allFolderNames();
 		ArrayList<File> files = new ArrayList<File>();
 		for(String name : folderNames) {
-			files.addAll(Arrays.asList(new File(System.getProperty("user.dir") + "/data/" + name + "/").listFiles(Util.filter())));
+			files.addAll(Arrays.asList(new File(System.getProperty("user.dir") + "/data/" + dataset + "/" + name + "/").listFiles(Util.filter())));
 		}
 		int len = files.size();
 		String[] ret = new String[len];
@@ -157,7 +165,7 @@ public class Util {
 //	Returns a String[] of all of the names of the folders containing raw files.
 	static String[] allFolderNames () {
 		
-		File[] fileList = new File(System.getProperty("user.dir") + "/data/").listFiles(Util.filter());
+		File[] fileList = new File(System.getProperty("user.dir") + "/data/raw/").listFiles(Util.filter());
 		int len = fileList.length;
 		String[] ret = new String[len];
 		for(int i = 0; i < len; i++) {
@@ -186,6 +194,7 @@ public class Util {
 		int len = series.length;
 		String ret = "";
 		for(int i = 0; i < len; i++) {
+			System.out.println(i + "/" + len + " datapoints copied");
 			ret += String.valueOf(series[i]);
 			if(i != len-1) {
 				ret += ",";

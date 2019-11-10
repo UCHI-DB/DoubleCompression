@@ -76,6 +76,17 @@ public class Compressor {
 		
 	}
 	
+//	Calls the compressor for the reference implementation of Sprintz.
+	static ByteBuffer sprintzRefCompressFile(String f, double[] series)
+			throws IOException {
+		
+		if(series == null) {
+			series = Reader.readRaw(f);
+		}
+		return new SprintzReferenceCompressor(series).compress();
+		
+	}
+	
 //	Calls the compressor for ToBinary.
 	static ByteBuffer toBinaryCompressFile(String f, double[] series)
 			throws IOException {
@@ -113,6 +124,8 @@ public class Compressor {
 				return gorillaRefCompressFile("", series);
 			case "Sprintz":
 				return sprintzCompressFile("", series);
+			case "SprintzRef":
+				return sprintzRefCompressFile("", series);
 			case "FCMGorilla":
 				return genericFCMCompressFile("", false, true, false, series);
 			case "DFCMGorilla":
@@ -146,6 +159,8 @@ public class Compressor {
 				return gorillaRefCompressFile(f, null);
 			case "Sprintz":
 				return sprintzCompressFile(f, null);
+			case "SprintzRef":
+				return sprintzRefCompressFile(f, null);
 			case "FCMGorilla":
 				return genericFCMCompressFile(f, false, true, false, null);
 			case "DFCMGorilla":
@@ -229,6 +244,17 @@ public class Compressor {
 		
 	}
 	
+//	Calls the decompressor for the reference implementation of Sprintz.
+	static double[] sprintzRefDecompressFile(String f, ByteBuffer compressed)
+			throws IOException {
+		
+		if(compressed == null) {
+			compressed = Reader.readCompressed(f);
+		}
+		return new SprintzReferenceDecompressor(compressed).decompress();
+		
+	}
+	
 //	Calls the decompressor for ToBinary.
 	static double[] toBinaryDecompressFile(String f, ByteBuffer compressed)
 			throws IOException {
@@ -267,6 +293,8 @@ public class Compressor {
 				return gorillaRefDecompressFile("", compressed);
 			case "Sprintz":
 				return sprintzDecompressFile("", compressed);
+			case "SprintzRef":
+				return sprintzRefDecompressFile("", compressed);
 			case "FCMGorilla":
 				return genericFCMDecompressFile("", false, true, false, compressed);
 			case "DFCMGorilla":
@@ -302,6 +330,8 @@ public class Compressor {
 				return gorillaRefDecompressFile(f, null);
 			case "Sprintz":
 				return sprintzDecompressFile(f, null);
+			case "SprintzRef":
+				return sprintzRefDecompressFile(f, null);
 			case "FCMGorilla":
 				return genericFCMDecompressFile(f, false, true, false, null);
 			case "DFCMGorilla":

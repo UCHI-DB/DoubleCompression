@@ -1,0 +1,8 @@
+"Method	",Compression Throughput (mb/s),Decompression Throughput (mb/s),CR
+"Xor			",,,
+"Null Suppression			",,,
+"Bit Packing			",,,
+"Xor + Null Suppression			",,,
+"Xor + Bit Packing			",,,
+"Null Suppression + Bit Packing			",,,
+All Three,85,82,0.54

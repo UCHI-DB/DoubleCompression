@@ -46,7 +46,6 @@ public class SprintzCompressor {
 			posInBlock = 0;
 			compressBlock(false);
 		}
-		byte[] test = Util.toByteArray(d);
 		block[posInBlock] = err(d);
 		prev = d;
 		posInBlock++;

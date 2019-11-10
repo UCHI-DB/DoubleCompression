@@ -28,7 +28,6 @@ There are many further avenues to take this research, ranging from fast tweaks t
 - Implement SprintzFIRE, which is outlined in the Sprintz paper as an alternative, more complex learning-based predictor that may lead to lower CRs for Sprintz than the current system of using xoring with the previous value (which itself if better than SprintzDelta).
 - Investigate compression of ints and run the outputs of ToInt through those for decreased CRs for lossy compression - this may involve modifying Gorilla, Sprintz, and (D)FCM to work for ints.
 - Investigate other double compression methods that I didn't get to. [FPC](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.388.2782&rep=rep1&type=pdf) boasts a very high throughput that should be investigated with our datasets, and it also uses rounding for (D)FCM, which we were meaning to investigate. A reference solution written in Go is available [here](https://github.com/spenczar/fpc).
-- Investigate what happens if, for each dataset in data, we make one long timeseries out of each individual timeseries. This may affect both the CR and throughput of each method, including gzip. One research paper suggested interpolating five values between the last value of one timeseries and the first value of another to smooth out the data and avoid artificial jumps.
 - Test all of the compression methods on other datasets, such as UCI, which may be less smooth and more random.
 
 # File Breakdown
