@@ -1,0 +1,13 @@
+Dataset,Method,Throughput (mb/s)
+,,
+UCR,Gorilla,105
+UCR,Sprintz,85
+UCR,gzip9,0.76
+,,
+UCI,Gorilla,59
+UCI,Sprintz,72
+UCI,gzip9,3
+,,
+Argonne,Gorilla,171
+Argonne,Sprintz,89
+Argonne,gzip9,4

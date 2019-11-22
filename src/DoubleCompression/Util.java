@@ -135,6 +135,9 @@ public class Util {
 
 //	Returns the path of the raw version of the given file.
 	static String rawPathify (String f, String dataset) {
+		if(dataset == "argonne") {
+			return System.getProperty("user.dir") + "/data/argonne/argonne/" + f;			
+		}
 		return System.getProperty("user.dir") + "/data/" + dataset + "/" + Util.getFolderName(f) + "/" + f;
 	}
 
@@ -149,7 +152,7 @@ public class Util {
 
 //	Returns a String[] of all of the raw file names.
 	static String[] allFileNames (String dataset) {
-		String[] folderNames = Util.allFolderNames();
+		String[] folderNames = Util.allFolderNames(dataset);
 		ArrayList<File> files = new ArrayList<File>();
 		for(String name : folderNames) {
 			files.addAll(Arrays.asList(new File(System.getProperty("user.dir") + "/data/" + dataset + "/" + name + "/").listFiles(Util.filter())));
@@ -161,11 +164,14 @@ public class Util {
 		}
 		return ret;
 	}
+	
+	static String[] allFolderNames() {
+		return allFolderNames("raw");
+	}
 
 //	Returns a String[] of all of the names of the folders containing raw files.
-	static String[] allFolderNames () {
-		
-		File[] fileList = new File(System.getProperty("user.dir") + "/data/raw/").listFiles(Util.filter());
+	static String[] allFolderNames (String dataset) {
+		File[] fileList = new File(System.getProperty("user.dir") + "/data/" + dataset + "/").listFiles(Util.filter());
 		int len = fileList.length;
 		String[] ret = new String[len];
 		for(int i = 0; i < len; i++) {

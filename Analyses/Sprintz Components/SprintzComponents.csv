@@ -1,8 +1,12 @@
-"Method	",Compression Throughput (mb/s),Decompression Throughput (mb/s),CR
-"Xor			",,,
-"Null Suppression			",,,
-"Bit Packing			",,,
-"Xor + Null Suppression			",,,
-"Xor + Bit Packing			",,,
-"Null Suppression + Bit Packing			",,,
-All Three,85,82,0.54
+UCR,,,,,,UCI,,,,,,Argonne,,,,
+"Method	",Compression Throughput (mb/s),Decompression Throughput (mb/s),CR,,,"Method	",Compression Throughput (mb/s),Decompression Throughput (mb/s),CR,,,"Method	",Compression Throughput (mb/s),Decompression Throughput (mb/s),CR,
+"Xor			",90,81,0.71,0,,"Xor			",80,191,0.72,0,,"Xor			",84,112,0.81,0
+"Null Suppression			",88,78,0.71,0,,"Null Suppression			",84,111,0.72,0,,"Null Suppression			",70,100,0.81,0
+"Bit Packing			",80,79,0.7,0.058823529,,"Bit Packing			",92,139,0.71,0.111111111,,"Bit Packing			",85,118,0.81,0
+"Xor + Null Suppression			",79,82,0.65,0.352941176,,"Xor + Null Suppression			",82,155,0.71,0.111111111,,"Xor + Null Suppression			",66,100,0.72,0.5
+"Xor + Bit Packing			",84,83,0.54,1,,"Xor + Bit Packing			",95,128,0.63,1,,"Xor + Bit Packing			",88,130,0.63,1
+"Null Suppression + Bit Packing			",84,78,0.7,0.058823529,,"Null Suppression + Bit Packing			",79,105,0.71,0.111111111,,"Null Suppression + Bit Packing			",74,98,0.81,0
+All Three,85,82,0.54,1,,All Three,61,79,0.63,1,,All Three,89,128,0.63,1
+,,,,,,,,,,,,,,,,
+,,Max,0.71,,,,,Max,0.72,,,,,Max,0.81,
+,,Min,0.54,,,,,Min,0.63,,,,,Min,0.63,

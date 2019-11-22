@@ -8,11 +8,70 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class Tester {
+	
+	static void datasetReport (String dataset) throws IOException {
+		String[] names = Util.allFileNames(dataset);
+		int namesLen = names.length;
+		String[][] ret = new String[namesLen][5];
+		for(int i = 0; i < namesLen; i++) {
+			double runTotal = 0;
+			double runCount = 0;
+			double intCount = 0;
+			double valCount = 0;
+			double diffSum = 0;
+			double diffSumErr = 0;
+			double[] data = Reader.readRaw(Util.rawPathify(names[i], dataset));
+			int dataLen = data.length;
+			double prev = 0;
+			double currRun = 1;
+			for(int j = 0; j < dataLen; j++) {
+				double d = data[j];
+				double remainder = d - Math.round(d);
+				if(remainder == 0) {
+					intCount++;
+				}
+				if(j > 0) {
+					diffSum += d - prev;
+					if(d == prev) {
+						currRun++;
+					} else {
+						runTotal += currRun;
+						runCount++;
+						currRun = 1;
+					}
+				}
+				valCount++;
+				prev = d;
+			}
+			double diffAvg = diffSum/dataLen;
+			for(int j = 0; j < dataLen; j++) {
+				double d = data[j];
+				if(j > 0) {
+					diffSumErr += Math.pow(d - prev - diffAvg, 2);
+				}
+				prev = d;
+			}
+			double diffVar = diffSumErr/(dataLen-1);
+			double smoothness = Math.sqrt(diffVar)/Math.abs(diffAvg);
+			double intPercentage = intCount/valCount;
+			double runAvg = runTotal/runCount;
+//			System.out.println("Smoothness: " + smoothness);
+//			System.out.println("Average Run Length: " + runAvg);
+//			System.out.println("Integer Percentage: " + intPercentage);
+			ret[i] = new String[] {dataset,
+					names[i],
+					String.valueOf(smoothness),
+					String.valueOf(intPercentage),
+					String.valueOf(runAvg)};
+			System.out.println((i+1) + "/" + namesLen + " done");
+		}
+		makeCSV(ret, "Analyses/Dataset Reports/" + dataset + ".csv");
+	}
 
 	
 	//Calculates and returns the compression ratio of the given file
-	static String compressionReport (String name) {
-		double rawSize = Util.fileSize(Util.rawPathify(name));
+	static String compressionReport (String name, String dataset) {
+		double rawSize = Util.fileSize(Util.rawPathify(name,dataset));
 		double compressedSize = Util.fileSize(Util.compressedPathify(name));
 		double ratio = Math.round((compressedSize / rawSize) * 100.0) / 100.0;
 		return String.valueOf(ratio);
@@ -31,7 +90,7 @@ public class Tester {
 		double[] decompressed = Compressor.directDecompress(compressed, method);
 		long decompressionEndTime = System.nanoTime();
 		Writer.writeCompressedToFile(compressed, name);
-		String ratio = compressionReport(name);
+		String ratio = compressionReport(name,dataset);
 		
 		double fileSize = Util.fileSize(Util.rawPathify(name,dataset));
 		double compressionTime = (compressionEndTime - compressionStartTime);
@@ -52,7 +111,7 @@ public class Tester {
 	}
 	
 	static String[][] fullTestReport (String method, boolean verbose) throws IOException{
-		return fullTestReport(method, verbose, "raw");
+		return fullTestReport(method, verbose, "UCR");
 	}
 
 	/*Calculates and returns the test report for all files using the given 
@@ -126,7 +185,7 @@ public class Tester {
 		    i++;
 		}
 		reader.close();
-		makeCSV(currentReport, "Analyses/Reports/Full Report.csv");
+		makeCSV(currentReport, "Analyses/Reports/" + dataset + "/Full Report.csv");
 	}
 
 //	Tests the correctness of the compression and decompression of all files 
@@ -187,7 +246,7 @@ public class Tester {
 //	Generates a full test report for the given compression method.
 	static void generateReport (String method, boolean verbose, String dataset) throws IOException {
 		if(verbose) {
-			makeCSV(fullTestReport(method, verbose), "Analyses/Reports/" + method + " Report.csv");
+			makeCSV(fullTestReport(method, verbose, dataset), "Analyses/Reports/" + dataset + "/" + method + " Report.csv");
 		}
 		else {
 			fullTestReport(method, verbose, dataset);

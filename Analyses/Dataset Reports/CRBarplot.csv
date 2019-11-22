@@ -1,0 +1,13 @@
+Dataset,Method,CR
+UCR,Binary,0.671
+UCR,Gorilla,0.633
+UCR,Sprintz,0.553
+UCR,gzip9,0.366
+UCI,Binary,0.684
+UCI,Gorilla,0.684
+UCI,Sprintz,0.624
+UCI,gzip9,0.184
+Argonne,Binary,0.769
+Argonne,Gorilla,0.278
+Argonne,Sprintz,0.634
+Argonne,gzip9,0.184

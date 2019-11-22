@@ -5,15 +5,16 @@ This project contains implementations of various compressors and decompressors o
 To compress data and generate reports, code should be written in Main.java. Some common function calls include:
 
 ```
-Tester.generateReport(methodName);
-Tester.generateReport(methodName, FCMLevel, blockSize);
+Tester.generateReport(methodName, verbose, datasetName);
 Tester.testCorrectnessFull(methodName);
 Tester.testCorrectnessOneFile(fileName, methodName);
 ```
 
+Note that GorillaRef and SprintzRef are the names of the Gorilla and Sprintz Compressors, respectively.
+
 # Results so far
 
-In my testing, the best method I have found is a slightly modified Sprintz (using xoring instead of diffing) with a block size of 2, which gives an average compression ratio of 0.54. For comparison, ToBinary gives a baseline CR of 0.67, while gzip9 gives a CR of 0.39. Sprintz (like Gorilla) has an advantage over gzip in that it is much faster, with an average compression throughput of \~15 mb/s as opposed to <1 mb/s for gzip. This may not be enough of a speed advantage to warrant the larger CR, but with further work we can hopefully reduce the CR attained by the double compression methods and increase their throughput to levels that make them a better alternative to gzip. ToInt provides a CR of 0.39 as well while also having an average compression throughput of \~20 mb/s.
+In my testing on the UCR dataset, the best method I have found is a slightly modified Sprintz (using xoring instead of diffing) with a block size of 2, which gives an average compression ratio of 0.54. For comparison, ToBinary gives a baseline CR of 0.67, while gzip9 gives a CR of 0.39. Sprintz (like Gorilla) has an advantage over gzip in that it is much faster, with an average compression throughput of \~85 mb/s as opposed to <1 mb/s for gzip. This may not be enough of a speed advantage to warrant the larger CR, but with further work we can hopefully reduce the CR attained by the double compression methods and increase their throughput to levels that make them a better alternative to gzip. ToInt provides a CR of 0.39 as well while also having an average compression throughput of \~20 mb/s, though it is not lossless.
 
 # Terminology and notes
 
@@ -22,12 +23,7 @@ In my testing, the best method I have found is a slightly modified Sprintz (usin
 
 # Next steps
 
-There are many further avenues to take this research, ranging from fast tweaks to major optimizations. These next steps include:
-
-- Implement SprintzFIRE, which is outlined in the Sprintz paper as an alternative, more complex learning-based predictor that may lead to lower CRs for Sprintz than the current system of using xoring with the previous value (which itself if better than SprintzDelta).
 - Investigate compression of ints and run the outputs of ToInt through those for decreased CRs for lossy compression - this may involve modifying Gorilla, Sprintz, and (D)FCM to work for ints.
-- Investigate other double compression methods that I didn't get to. [FPC](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.388.2782&rep=rep1&type=pdf) boasts a very high throughput that should be investigated with our datasets, and it also uses rounding for (D)FCM, which we were meaning to investigate. A reference solution written in Go is available [here](https://github.com/spenczar/fpc).
-- Test all of the compression methods on other datasets, such as UCI, which may be less smooth and more random.
 
 # File Breakdown
 

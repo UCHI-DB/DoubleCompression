@@ -1,0 +1,12 @@
+Method,Compression Throughput (mb/s),Decompression Throuhgput (mb/s),CR
+DFCM,77,107,0.69
+DFCMGorilla,14,18,0.62
+FCM,99,146,0.69
+FCMGorilla,13,17,0.62
+Gorilla,15,20,0.69
+GorillaRef,73,98,0.69
+Sprintz,12,11,0.63
+SprintzRef,75,108,0.63
+ToBinary,477,1175,0.69
+ToInt,19,13,0.4
+gzip9,3,70,0.2

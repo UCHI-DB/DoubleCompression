@@ -32,7 +32,7 @@ public class GorillaCompressor {
 		flush();
 		long endTime = System.nanoTime();
 		long time = endTime - startTime;
-		System.out.println(100 * (double) totalConvertTime / time);
+//		System.out.println(100 * (double) totalConvertTime / time);
 		return ByteBuffer.wrap(ret.toByteArray());
 	}
 	
