@@ -3,8 +3,6 @@ package DoubleCompression;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-import fi.iki.yak.ts.compression.gorilla.*;
-
 public class GorillaReferenceDecompressor {
 
 	ByteBuffer input;

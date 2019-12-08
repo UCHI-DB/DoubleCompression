@@ -2,8 +2,6 @@ package DoubleCompression;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import fi.iki.yak.ts.compression.gorilla.*;
-import fi.iki.yak.ts.compression.gorilla.GorillaCompressor;
 
 public class SprintzReferenceCompressor {
 	

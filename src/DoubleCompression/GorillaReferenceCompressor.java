@@ -1,8 +1,6 @@
 package DoubleCompression;
 
 import java.nio.ByteBuffer;
-import fi.iki.yak.ts.compression.gorilla.*;
-import fi.iki.yak.ts.compression.gorilla.GorillaCompressor;
 
 public class GorillaReferenceCompressor {
 	

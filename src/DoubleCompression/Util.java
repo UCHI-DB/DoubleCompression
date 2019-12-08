@@ -130,7 +130,7 @@ public class Util {
 	}
 	
 	static String rawPathify (String f) {
-		return rawPathify(f, "raw");
+		return rawPathify(f, "UCR");
 	}
 
 //	Returns the path of the raw version of the given file.
@@ -147,7 +147,7 @@ public class Util {
 	}
 	
 	static String[] allFileNames() {
-		return allFileNames("raw");
+		return allFileNames("UCR");
 	}
 
 //	Returns a String[] of all of the raw file names.
@@ -166,7 +166,7 @@ public class Util {
 	}
 	
 	static String[] allFolderNames() {
-		return allFolderNames("raw");
+		return allFolderNames("UCR");
 	}
 
 //	Returns a String[] of all of the names of the folders containing raw files.

@@ -2,7 +2,6 @@ package DoubleCompression;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import fi.iki.yak.ts.compression.gorilla.*;
 
 public class Compressor {
 	
